@@ -23,8 +23,11 @@ public class AdminController : ControllerBase
         try
         {
             ValidateRequest(userDto);
-            var response = await _keycloakUtils.CreateUser(userDto);
-            return Ok(response);
+            var createUser = await _keycloakUtils.CreateUser(userDto);
+            
+            if (!createUser)
+                return BadRequest();
+            return Ok();
         }
         catch (Exception ex)
         {

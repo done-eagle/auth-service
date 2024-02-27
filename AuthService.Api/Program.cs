@@ -21,12 +21,12 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-}).AddJwtBearer(o =>
+}).AddJwtBearer(jwtOptions =>
 {
-    o.Authority = builder.Configuration["Keycloak:Authority"];
-    o.Audience = builder.Configuration["Keycloak:Audience"];
-    o.RequireHttpsMetadata = false;
-    o.Events = new JwtBearerEvents()
+    jwtOptions.Authority = builder.Configuration["Keycloak:Authority"];
+    jwtOptions.Audience = builder.Configuration["Keycloak:Audience"];
+    jwtOptions.RequireHttpsMetadata = false;
+    jwtOptions.Events = new JwtBearerEvents()
     {
         OnAuthenticationFailed = context => Task.CompletedTask
     };
