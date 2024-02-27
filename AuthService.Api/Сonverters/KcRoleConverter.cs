@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace AuthService.Api.Сonverters;
 
-public class KcJwtConverter : IClaimsTransformation
+public class KcRoleConverter : IClaimsTransformation
 {
     public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
     {

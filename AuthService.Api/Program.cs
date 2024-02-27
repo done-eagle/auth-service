@@ -1,3 +1,4 @@
+using AuthService.Api.Keycloak;
 using AuthService.Api.Сonverters;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -22,8 +23,8 @@ builder.Services.AddAuthentication(options =>
 
 }).AddJwtBearer(o =>
 {
-    o.Authority = builder.Configuration["Jwt:Authority"];
-    o.Audience = builder.Configuration["Jwt:Audience"];
+    o.Authority = builder.Configuration["Keycloak:Authority"];
+    o.Audience = builder.Configuration["Keycloak:Audience"];
     o.RequireHttpsMetadata = false;
     o.Events = new JwtBearerEvents()
     {
@@ -31,7 +32,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<IClaimsTransformation, KcJwtConverter>();
+builder.Services.AddSingleton<IClaimsTransformation, KcRoleConverter>();
+
+builder.Services.AddSingleton<IKeycloakUtils>(new KeycloakUtils(
+    builder.Configuration["Keycloak:ServerUrl"], 
+    builder.Configuration["Keycloak:Realm"], 
+    builder.Configuration["Keycloak:ClientId"], 
+    builder.Configuration["Keycloak:ClientSecret"]));
 
 var app = builder.Build();
 
