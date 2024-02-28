@@ -35,8 +35,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddSingleton<IClaimsTransformation, KcRoleConverter>();
 
 builder.Services.AddSingleton<IKeycloakUtils>(new KeycloakUtils(
-    builder.Configuration["Keycloak:ServerUrl"], 
-    builder.Configuration["Keycloak:Realm"], 
+    builder.Configuration["Keycloak:ServerUrl"],
     builder.Configuration["Keycloak:ClientId"], 
     builder.Configuration["Keycloak:ClientSecret"]));
 

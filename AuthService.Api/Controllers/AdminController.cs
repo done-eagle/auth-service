@@ -11,10 +11,14 @@ namespace AuthService.Api.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly IKeycloakUtils _keycloakUtils;
+    private readonly IConfiguration _config;
+    private const string RealmConfigKey = "Keycloak:Realm";
+    private const string UserRole = "user";
 
-    public AdminController(IKeycloakUtils keycloakUtils)
+    public AdminController(IKeycloakUtils keycloakUtils, IConfiguration config)
     {
-        _keycloakUtils = keycloakUtils; 
+        _keycloakUtils = keycloakUtils;
+        _config = config;
     }
 
     [HttpPost]
@@ -23,9 +27,11 @@ public class AdminController : ControllerBase
         try
         {
             ValidateRequest(userDto);
-            var createdUserId = await _keycloakUtils.CreateUser(userDto);
-            
+            var createdUserId = await _keycloakUtils.CreateUser(_config[RealmConfigKey], userDto);
             Console.WriteLine("User created with userId: " + createdUserId);
+
+            var defaultRoles = new List<string> { UserRole };
+            await _keycloakUtils.AddRoles(_config[RealmConfigKey], createdUserId, defaultRoles);
             return Ok();
         }
         catch (Exception ex)

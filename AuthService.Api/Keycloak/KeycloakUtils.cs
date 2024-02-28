@@ -8,19 +8,18 @@ public class KeycloakUtils : IKeycloakUtils
 {
     private readonly KeycloakClient _keycloakClient;
     
-    public KeycloakUtils(string serverUrl, string realm, string clientId, string clientSecret)
+    public KeycloakUtils(string serverUrl, string clientId, string clientSecret)
     {
         _keycloakClient = new KeycloakClient(
             serverUrl, 
             clientSecret, 
             new KeycloakOptions(
                 prefix: "/auth",
-                adminClientId: clientId, 
-                authenticationRealm: realm
+                adminClientId: clientId
             ));
     }
 
-    public async Task<string> CreateUser(CreateUserDto createUserDto)
+    public async Task<string> CreateUser(string realm, CreateUserDto createUserDto)
     {
         var credential = CreatePasswordCredentials(createUserDto.Password);
         var user = new User
@@ -31,9 +30,28 @@ public class KeycloakUtils : IKeycloakUtils
             Enabled = true,
             EmailVerified = false
         };
-        var response = await _keycloakClient.CreateAndRetrieveUserIdAsync("memeapp-realm", user);
+        var response = await _keycloakClient.CreateAndRetrieveUserIdAsync(realm, user);
 
         return response;
+    }
+
+    public async Task AddRoles(string realm, string userId, List<string> roles)
+    {
+        var user = await _keycloakClient.GetUserAsync(realm, userId);
+        
+        if (user != null)
+        {
+            var existingRoles = user.RealmRoles?.ToList() ?? new List<string>();
+            existingRoles.AddRange(roles);
+            user.RealmRoles = existingRoles;
+        
+            // Сохраняем изменения в Keycloak
+            await _keycloakClient.UpdateUserAsync(realm, userId, user);
+        } 
+        else
+        {
+            throw new ApplicationException($"User with id {userId} not found.");
+        }
     }
 
     private Credentials CreatePasswordCredentials(string password)
