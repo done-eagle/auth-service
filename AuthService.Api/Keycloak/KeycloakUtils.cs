@@ -20,7 +20,7 @@ public class KeycloakUtils : IKeycloakUtils
             ));
     }
 
-    public async Task<bool> CreateUser(CreateUserDto createUserDto)
+    public async Task<string> CreateUser(CreateUserDto createUserDto)
     {
         var credential = CreatePasswordCredentials(createUserDto.Password);
         var user = new User
@@ -31,7 +31,7 @@ public class KeycloakUtils : IKeycloakUtils
             Enabled = true,
             EmailVerified = false
         };
-        var response = await _keycloakClient.CreateUserAsync("memeapp-realm", user);
+        var response = await _keycloakClient.CreateAndRetrieveUserIdAsync("memeapp-realm", user);
 
         return response;
     }

@@ -4,5 +4,5 @@ namespace AuthService.Api.Keycloak;
 
 public interface IKeycloakUtils
 {
-    Task<bool> CreateUser(CreateUserDto createUserDto);
+    Task<string> CreateUser(CreateUserDto createUserDto);
 }

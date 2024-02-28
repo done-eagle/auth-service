@@ -23,10 +23,9 @@ public class AdminController : ControllerBase
         try
         {
             ValidateRequest(userDto);
-            var createUser = await _keycloakUtils.CreateUser(userDto);
+            var createdUserId = await _keycloakUtils.CreateUser(userDto);
             
-            if (!createUser)
-                return BadRequest();
+            Console.WriteLine("User created with userId: " + createdUserId);
             return Ok();
         }
         catch (Exception ex)
