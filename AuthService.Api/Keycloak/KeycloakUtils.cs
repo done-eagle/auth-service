@@ -1,4 +1,4 @@
-using AuthService.Api.Dto;
+using AuthService.Api.Dto.Request;
 using Keycloak.Net;
 using Keycloak.Net.Models.Users;
 
@@ -19,14 +19,14 @@ public class KeycloakUtils : IKeycloakUtils
             ));
     }
 
-    public async Task<string> CreateUser(string realm, CreateUserDto createUserDto)
+    public async Task<string> CreateUser(string realm, CreateUserRequestDto createUserRequestDto)
     {
-        var credential = CreatePasswordCredentials(createUserDto.Password);
+        var credential = CreatePasswordCredentials(createUserRequestDto.Password);
         var user = new User
         {
-            UserName = createUserDto.Username,
+            UserName = createUserRequestDto.Username,
             Credentials = new[] { credential },
-            Email = createUserDto.Email,
+            Email = createUserRequestDto.Email,
             Enabled = true,
             EmailVerified = false
         };
@@ -35,24 +35,45 @@ public class KeycloakUtils : IKeycloakUtils
         return response;
     }
 
-    public async Task AddRoles(string realm, string userId, List<string> roles)
+    public async Task<User> FindById(string realm, string userId)
     {
-        var user = await _keycloakClient.GetUserAsync(realm, userId);
-        
-        if (user != null)
-        {
-            var existingRoles = user.RealmRoles?.ToList() ?? new List<string>();
-            existingRoles.AddRange(roles);
-            user.RealmRoles = existingRoles;
-        
-            // Сохраняем изменения в Keycloak
-            await _keycloakClient.UpdateUserAsync(realm, userId, user);
-        } 
-        else
-        {
-            throw new ApplicationException($"User with id {userId} not found.");
-        }
+        return await _keycloakClient.GetUserAsync(realm, userId);
     }
+
+    public async Task UpdateUser(string realm, UpdateUserRequestDto updateUserRequestDto)
+    {
+        var user = await _keycloakClient.GetUserAsync(realm, updateUserRequestDto.UserId);
+        var credential = CreatePasswordCredentials(updateUserRequestDto.Password);
+        
+        user.Email = updateUserRequestDto.Email;
+        user.Credentials = new[] { credential };
+        
+        await _keycloakClient.UpdateUserAsync(realm, updateUserRequestDto.UserId, user);
+    }
+
+    public async Task DeleteUser(string realm, string userId)
+    {
+        await _keycloakClient.DeleteUserAsync(realm, userId);
+    }
+
+    // public async Task AddRoles(string realm, string userId, List<string> roles)
+    // {
+    //     var user = await _keycloakClient.GetUserAsync(realm, userId);
+    //     
+    //     if (user != null)
+    //     {
+    //         var existingRoles = user.RealmRoles?.ToList() ?? new List<string>();
+    //         existingRoles.AddRange(roles);
+    //         user.RealmRoles = existingRoles;
+    //     
+    //         // Сохраняем изменения в Keycloak
+    //         await _keycloakClient.UpdateUserAsync(realm, userId, user);
+    //     } 
+    //     else
+    //     {
+    //         throw new ApplicationException($"User with id {userId} not found.");
+    //     }
+    // }
 
     private Credentials CreatePasswordCredentials(string password)
     {

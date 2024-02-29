@@ -1,4 +1,5 @@
 using AuthService.Api.Keycloak;
+using AuthService.Api.Mapper;
 using AuthService.Api.Сonverters;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(AppMappingProfile));
 
 builder.Services.AddLogging(logging =>
 {
