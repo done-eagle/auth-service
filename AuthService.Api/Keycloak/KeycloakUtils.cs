@@ -35,9 +35,9 @@ public class KeycloakUtils : IKeycloakUtils
         return response;
     }
 
-    public async Task<User> FindById(string realm, string userId)
+    public async Task<User> FindById(string realm, FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        return await _keycloakClient.GetUserAsync(realm, userId);
+        return await _keycloakClient.GetUserAsync(realm, findUserByIdRequestDto.UserId);
     }
 
     public async Task UpdateUser(string realm, UpdateUserRequestDto updateUserRequestDto)
@@ -51,29 +51,10 @@ public class KeycloakUtils : IKeycloakUtils
         await _keycloakClient.UpdateUserAsync(realm, updateUserRequestDto.UserId, user);
     }
 
-    public async Task DeleteUser(string realm, string userId)
+    public async Task DeleteUser(string realm, FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        await _keycloakClient.DeleteUserAsync(realm, userId);
+        await _keycloakClient.DeleteUserAsync(realm, findUserByIdRequestDto.UserId);
     }
-
-    // public async Task AddRoles(string realm, string userId, List<string> roles)
-    // {
-    //     var user = await _keycloakClient.GetUserAsync(realm, userId);
-    //     
-    //     if (user != null)
-    //     {
-    //         var existingRoles = user.RealmRoles?.ToList() ?? new List<string>();
-    //         existingRoles.AddRange(roles);
-    //         user.RealmRoles = existingRoles;
-    //     
-    //         // Сохраняем изменения в Keycloak
-    //         await _keycloakClient.UpdateUserAsync(realm, userId, user);
-    //     } 
-    //     else
-    //     {
-    //         throw new ApplicationException($"User with id {userId} not found.");
-    //     }
-    // }
 
     private Credentials CreatePasswordCredentials(string password)
     {

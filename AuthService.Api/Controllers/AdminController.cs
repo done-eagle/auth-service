@@ -27,12 +27,12 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] CreateUserRequestDto userRequestDto)
+    public async Task<IActionResult> Add([FromBody] CreateUserRequestDto createUserRequestDto)
     {
         try
         {
-            RequestValidator.ValidateRequest(userRequestDto);
-            var createdUserId = await _keycloakUtils.CreateUser(_config[RealmConfigKey], userRequestDto);
+            RequestValidator.ValidateRequest(createUserRequestDto);
+            var createdUserId = await _keycloakUtils.CreateUser(_config[RealmConfigKey], createUserRequestDto);
             Console.WriteLine($"User created with userId: {createdUserId}");
 
             return Ok();
@@ -48,12 +48,12 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> FindById([FromBody] FindUserByIdRequestDto userRequestDto)
+    public async Task<IActionResult> FindById([FromBody] FindUserByIdRequestDto findUserByIdRequestDto)
     {
         try
         {
-            RequestValidator.ValidateRequest(userRequestDto);
-            var user = await _keycloakUtils.FindById(_config[RealmConfigKey], userRequestDto.UserId);
+            RequestValidator.ValidateRequest(findUserByIdRequestDto);
+            var user = await _keycloakUtils.FindById(_config[RealmConfigKey], findUserByIdRequestDto);
             var userResponseDto = _mapper.Map<FindUserByIdResponseDto>(user);
             return Ok(userResponseDto);
         }
@@ -63,17 +63,17 @@ public class AdminController : ControllerBase
         }
         catch (FlurlHttpException)
         {
-            return NotFound($"User with userId: {userRequestDto.UserId} not found");
+            return NotFound($"User with userId: {findUserByIdRequestDto.UserId} not found");
         }
     }
 
     [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateUserRequestDto userRequestDto)
+    public async Task<IActionResult> Update([FromBody] UpdateUserRequestDto updateUserRequestDto)
     {
         try
         {
-            RequestValidator.ValidateRequest(userRequestDto);
-            await _keycloakUtils.UpdateUser(_config[RealmConfigKey], userRequestDto);
+            RequestValidator.ValidateRequest(updateUserRequestDto);
+            await _keycloakUtils.UpdateUser(_config[RealmConfigKey], updateUserRequestDto);
             return Ok();
         }
         catch (ApplicationException ex)
@@ -82,17 +82,17 @@ public class AdminController : ControllerBase
         }
         catch (FlurlHttpException)
         {
-            return NotFound($"User with userId: {userRequestDto.UserId} not found");
+            return NotFound($"User with userId: {updateUserRequestDto.UserId} not found");
         }
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromBody] DeleteUserRequestDto userRequestDto)
+    public async Task<IActionResult> Delete([FromBody] FindUserByIdRequestDto findUserByIdRequestDto)
     {
         try
         {
-            RequestValidator.ValidateRequest(userRequestDto);
-            await _keycloakUtils.DeleteUser(_config[RealmConfigKey], userRequestDto.UserId);
+            RequestValidator.ValidateRequest(findUserByIdRequestDto);
+            await _keycloakUtils.DeleteUser(_config[RealmConfigKey], findUserByIdRequestDto);
             return Ok();
         }
         catch (ApplicationException ex)
@@ -101,7 +101,7 @@ public class AdminController : ControllerBase
         }
         catch (FlurlHttpException)
         {
-            return NotFound($"User with userId: {userRequestDto.UserId} not found");
+            return NotFound($"User with userId: {findUserByIdRequestDto.UserId} not found");
         }
     }
 }

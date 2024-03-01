@@ -29,10 +29,4 @@ internal static class RequestValidator
         if (userRequestDto.Password is null or "")
             throw new ApplicationException("Incorrect password");
     }
-
-    public static void ValidateRequest(DeleteUserRequestDto userRequestDto)
-    {
-        if (userRequestDto.UserId is null or "")
-            throw new ApplicationException("Incorrect userId");
-    }
 }
