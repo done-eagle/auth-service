@@ -20,6 +20,16 @@ internal static class RequestValidator
             throw new ApplicationException("Incorrect password");
     }
 
+    public static void ValidateRequest(LoginUserRequestDto userRequestDto)
+    {
+        if (userRequestDto.Username is null or "")
+            throw new ApplicationException("Incorrect username");
+        if (userRequestDto.Password is null or "")
+            throw new ApplicationException("Incorrect password");
+        if (userRequestDto.CodeChallenge is null or "")
+            throw new ApplicationException("Incorrect code_challenge");
+    }
+
     public static void ValidateRequest(FindUserByIdRequestDto userDto)
     {
         if (userDto.UserId is null or "")

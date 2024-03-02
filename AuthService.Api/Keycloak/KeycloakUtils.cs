@@ -37,6 +37,11 @@ public class KeycloakUtils : IKeycloakUtils
         return response;
     }
 
+    public async Task AuthenticateUser(string realm, LoginUserRequestDto loginUserRequestDto)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<FindUserByIdResponseDto> FindById(string realm, FindUserByIdRequestDto findUserByIdRequestDto)
     {
         var user = await _keycloakClient.GetUserAsync(realm, findUserByIdRequestDto.UserId);

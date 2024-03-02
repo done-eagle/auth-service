@@ -48,9 +48,18 @@ public class AuthController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public IActionResult Login()
+    public async Task<IActionResult> Login([FromBody] LoginUserRequestDto userRequestDto)
     {
-        return Ok("Login");
+        try
+        {
+            RequestValidator.ValidateRequest(userRequestDto);
+            await _keycloakUtils.AuthenticateUser(_config[RealmConfigKey], userRequestDto);
+            return Ok();
+        }
+        catch (ApplicationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
     [HttpGet]
