@@ -8,6 +8,12 @@ internal static class RequestValidator
     {
         if (userRequestDto.Username is null or "")
             throw new ApplicationException("Incorrect username");
+        if (userRequestDto.FirstName is null or "")
+            throw new ApplicationException("Incorrect firstname");
+        if (userRequestDto.LastName is null or "")
+            throw new ApplicationException("Incorrect lastname");
+        if (userRequestDto.PhoneNumber is null or "")
+            throw new ApplicationException("Incorrect phone number");
         if (userRequestDto.Email is null or "")
             throw new ApplicationException("Incorrect email");
         if (userRequestDto.Password is null or "")

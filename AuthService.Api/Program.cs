@@ -1,6 +1,7 @@
 using AuthService.Api.Keycloak;
 using AuthService.Api.Mapper;
 using AuthService.Api.Сonverters;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -36,10 +37,18 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSingleton<IClaimsTransformation, KcRoleConverter>();
 
-builder.Services.AddSingleton<IKeycloakUtils>(new KeycloakUtils(
-    builder.Configuration["Keycloak:ServerUrl"],
-    builder.Configuration["Keycloak:ClientId"], 
-    builder.Configuration["Keycloak:ClientSecret"]));
+builder.Services.AddSingleton<IKeycloakUtils>(provider =>
+{
+    var mapper = provider.GetRequiredService<IMapper>();
+
+    return new KeycloakUtils(
+        builder.Configuration["Keycloak:ServerUrl"],
+        builder.Configuration["Keycloak:ClientId"],
+        builder.Configuration["Keycloak:ClientSecret"],
+        mapper
+    );
+});
+    
 
 var app = builder.Build();
 

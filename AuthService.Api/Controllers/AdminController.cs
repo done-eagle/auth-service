@@ -1,8 +1,6 @@
 using AuthService.Api.Dto.Request;
-using AuthService.Api.Dto.Response;
 using AuthService.Api.Keycloak;
 using AuthService.Api.Validation;
-using AutoMapper;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +14,12 @@ public class AdminController : ControllerBase
 {
     private readonly IKeycloakUtils _keycloakUtils;
     private readonly IConfiguration _config;
-    private readonly IMapper _mapper;
     private const string RealmConfigKey = "Keycloak:Realm";
 
-    public AdminController(IKeycloakUtils keycloakUtils, IConfiguration config, IMapper mapper)
+    public AdminController(IKeycloakUtils keycloakUtils, IConfiguration config)
     {
         _keycloakUtils = keycloakUtils;
         _config = config;
-        _mapper = mapper;
     }
 
     [HttpPost]
@@ -34,7 +30,6 @@ public class AdminController : ControllerBase
             RequestValidator.ValidateRequest(createUserRequestDto);
             var createdUserId = await _keycloakUtils.CreateUser(_config[RealmConfigKey], createUserRequestDto);
             Console.WriteLine($"User created with userId: {createdUserId}");
-
             return Ok();
         }
         catch (ApplicationException ex)
@@ -53,8 +48,7 @@ public class AdminController : ControllerBase
         try
         {
             RequestValidator.ValidateRequest(findUserByIdRequestDto);
-            var user = await _keycloakUtils.FindById(_config[RealmConfigKey], findUserByIdRequestDto);
-            var userResponseDto = _mapper.Map<FindUserByIdResponseDto>(user);
+            var userResponseDto = await _keycloakUtils.FindById(_config[RealmConfigKey], findUserByIdRequestDto);
             return Ok(userResponseDto);
         }
         catch (ApplicationException ex)

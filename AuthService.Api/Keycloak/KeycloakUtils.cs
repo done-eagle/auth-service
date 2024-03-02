@@ -1,4 +1,6 @@
 using AuthService.Api.Dto.Request;
+using AuthService.Api.Dto.Response;
+using AutoMapper;
 using Keycloak.Net;
 using Keycloak.Net.Models.Users;
 
@@ -7,9 +9,11 @@ namespace AuthService.Api.Keycloak;
 public class KeycloakUtils : IKeycloakUtils
 {
     private readonly KeycloakClient _keycloakClient;
+    private readonly IMapper _mapper;
     
-    public KeycloakUtils(string serverUrl, string clientId, string clientSecret)
+    public KeycloakUtils(string serverUrl, string clientId, string clientSecret, IMapper mapper)
     {
+        _mapper = mapper;
         _keycloakClient = new KeycloakClient(
             serverUrl, 
             clientSecret, 
@@ -22,22 +26,21 @@ public class KeycloakUtils : IKeycloakUtils
     public async Task<string> CreateUser(string realm, CreateUserRequestDto createUserRequestDto)
     {
         var credential = CreatePasswordCredentials(createUserRequestDto.Password);
-        var user = new User
-        {
-            UserName = createUserRequestDto.Username,
-            Credentials = new[] { credential },
-            Email = createUserRequestDto.Email,
-            Enabled = true,
-            EmailVerified = false
-        };
+        var user = _mapper.Map<User>(createUserRequestDto);
+        
+        user.Enabled = true;
+        user.EmailVerified = false;
+        user.Credentials = new[] { credential };
+        
         var response = await _keycloakClient.CreateAndRetrieveUserIdAsync(realm, user);
 
         return response;
     }
 
-    public async Task<User> FindById(string realm, FindUserByIdRequestDto findUserByIdRequestDto)
+    public async Task<FindUserByIdResponseDto> FindById(string realm, FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        return await _keycloakClient.GetUserAsync(realm, findUserByIdRequestDto.UserId);
+        var user = await _keycloakClient.GetUserAsync(realm, findUserByIdRequestDto.UserId);
+        return _mapper.Map<FindUserByIdResponseDto>(user);
     }
 
     public async Task UpdateUser(string realm, UpdateUserRequestDto updateUserRequestDto)
