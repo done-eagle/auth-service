@@ -37,15 +37,23 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSingleton<IClaimsTransformation, KcRoleConverter>();
 
+builder.Services.AddSingleton(builder.Configuration);
+
+builder.Services.AddHttpClient();
+
 builder.Services.AddSingleton<IKeycloakUtils>(provider =>
 {
     var mapper = provider.GetRequiredService<IMapper>();
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
 
     return new KeycloakUtils(
-        builder.Configuration["Keycloak:ServerUrl"],
-        builder.Configuration["Keycloak:ClientId"],
-        builder.Configuration["Keycloak:ClientSecret"],
-        mapper
+        configuration["Keycloak:ServerUrl"],
+        configuration["Keycloak:ClientId"],
+        configuration["Keycloak:ClientSecret"],
+        mapper,
+        configuration,
+        httpClientFactory
     );
 });
     

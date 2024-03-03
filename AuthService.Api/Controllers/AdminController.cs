@@ -13,13 +13,10 @@ namespace AuthService.Api.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly IKeycloakUtils _keycloakUtils;
-    private readonly IConfiguration _config;
-    private const string RealmConfigKey = "Keycloak:Realm";
 
-    public AdminController(IKeycloakUtils keycloakUtils, IConfiguration config)
+    public AdminController(IKeycloakUtils keycloakUtils)
     {
         _keycloakUtils = keycloakUtils;
-        _config = config;
     }
 
     [HttpPost]
@@ -28,7 +25,7 @@ public class AdminController : ControllerBase
         try
         {
             RequestValidator.ValidateRequest(createUserRequestDto);
-            var createdUserId = await _keycloakUtils.CreateUser(_config[RealmConfigKey], createUserRequestDto);
+            var createdUserId = await _keycloakUtils.CreateUser(createUserRequestDto);
             Console.WriteLine($"User created with userId: {createdUserId}");
             return Ok();
         }
@@ -48,7 +45,7 @@ public class AdminController : ControllerBase
         try
         {
             RequestValidator.ValidateRequest(findUserByIdRequestDto);
-            var userResponseDto = await _keycloakUtils.FindById(_config[RealmConfigKey], findUserByIdRequestDto);
+            var userResponseDto = await _keycloakUtils.FindById(findUserByIdRequestDto);
             return Ok(userResponseDto);
         }
         catch (ApplicationException ex)
@@ -67,7 +64,7 @@ public class AdminController : ControllerBase
         try
         {
             RequestValidator.ValidateRequest(updateUserRequestDto);
-            await _keycloakUtils.UpdateUser(_config[RealmConfigKey], updateUserRequestDto);
+            await _keycloakUtils.UpdateUser(updateUserRequestDto);
             return Ok();
         }
         catch (ApplicationException ex)
@@ -86,7 +83,7 @@ public class AdminController : ControllerBase
         try
         {
             RequestValidator.ValidateRequest(findUserByIdRequestDto);
-            await _keycloakUtils.DeleteUser(_config[RealmConfigKey], findUserByIdRequestDto);
+            await _keycloakUtils.DeleteUser(findUserByIdRequestDto);
             return Ok();
         }
         catch (ApplicationException ex)

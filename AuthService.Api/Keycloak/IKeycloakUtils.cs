@@ -5,9 +5,9 @@ namespace AuthService.Api.Keycloak;
 
 public interface IKeycloakUtils
 {
-    Task<string> CreateUser(string realm, CreateUserRequestDto createUserRequestDto);
-    Task AuthenticateUser(string realm, LoginUserRequestDto loginUserRequestDto);
-    Task<FindUserByIdResponseDto> FindById(string realm, FindUserByIdRequestDto findUserByIdRequestDto);
-    Task UpdateUser(string realm, UpdateUserRequestDto updateUserRequestDto);
-    Task DeleteUser(string realm, FindUserByIdRequestDto findUserByIdRequestDto);
+    Task<string> CreateUser(CreateUserRequestDto createUserRequestDto);
+    Task<string> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto);
+    Task<FindUserByIdResponseDto> FindById(FindUserByIdRequestDto findUserByIdRequestDto);
+    Task UpdateUser(UpdateUserRequestDto updateUserRequestDto);
+    Task DeleteUser(FindUserByIdRequestDto findUserByIdRequestDto);
 }

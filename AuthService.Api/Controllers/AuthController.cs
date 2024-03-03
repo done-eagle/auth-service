@@ -1,7 +1,6 @@
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Keycloak;
 using AuthService.Api.Validation;
-using AutoMapper;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +12,10 @@ namespace AuthService.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IKeycloakUtils _keycloakUtils;
-    private readonly IConfiguration _config;
-    private readonly IMapper _mapper;
-    private const string RealmConfigKey = "Keycloak:Realm";
 
-    public AuthController(IKeycloakUtils keycloakUtils, IConfiguration config, IMapper mapper)
+    public AuthController(IKeycloakUtils keycloakUtils)
     {
         _keycloakUtils = keycloakUtils;
-        _config = config;
-        _mapper = mapper;
     }
     
     [HttpPost]
@@ -31,7 +25,7 @@ public class AuthController : ControllerBase
         try
         {
             RequestValidator.ValidateRequest(userRequestDto);
-            var createdUserId = await _keycloakUtils.CreateUser(_config[RealmConfigKey], userRequestDto);
+            var createdUserId = await _keycloakUtils.CreateUser(userRequestDto);
             Console.WriteLine($"User created with userId: {createdUserId}");
     
             return Ok();
@@ -40,21 +34,22 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (FlurlHttpException)
+        catch (Exception ex)
         {
-            return Conflict("User with such data already exist");
+            //return Conflict("User with such data already exist");
+            return BadRequest(ex.Message);
         }
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> Login([FromBody] LoginUserRequestDto userRequestDto)
+    public async Task<IActionResult> Login([FromBody] GetAccessTokenRequestDto userRequestDto)
     {
         try
         {
             RequestValidator.ValidateRequest(userRequestDto);
-            await _keycloakUtils.AuthenticateUser(_config[RealmConfigKey], userRequestDto);
-            return Ok();
+            var authCode = await _keycloakUtils.GetAccessToken(userRequestDto);
+            return Content(authCode, "application/json");
         }
         catch (ApplicationException ex)
         {

@@ -20,14 +20,12 @@ internal static class RequestValidator
             throw new ApplicationException("Incorrect password");
     }
 
-    public static void ValidateRequest(LoginUserRequestDto userRequestDto)
+    public static void ValidateRequest(GetAccessTokenRequestDto userRequestDto)
     {
-        if (userRequestDto.Username is null or "")
-            throw new ApplicationException("Incorrect username");
-        if (userRequestDto.Password is null or "")
-            throw new ApplicationException("Incorrect password");
-        if (userRequestDto.CodeChallenge is null or "")
-            throw new ApplicationException("Incorrect code_challenge");
+        if (userRequestDto.AuthCode is null or "")
+            throw new ApplicationException("Incorrect authorization_code");
+        if (userRequestDto.CodeVerifier is null or "")
+            throw new ApplicationException("Incorrect code_verifier");
     }
 
     public static void ValidateRequest(FindUserByIdRequestDto userDto)
