@@ -1,6 +1,8 @@
+using System.Net;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Dto.Response;
 using AutoMapper;
+using Flurl.Http;
 using Keycloak.Net;
 using Keycloak.Net.Models.Users;
 
@@ -67,7 +69,7 @@ public class KeycloakUtils : IKeycloakUtils
     public async Task<string> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto)
     {
         using var httpClient = _httpClientFactory.CreateClient();
-        var tokenRequestParameters = new Dictionary<string, string>
+        var requestContent = new Dictionary<string, string>
         {
             { "grant_type", "authorization_code" },
             { "client_id", _config["Keycloak:ClientId"] },
@@ -77,12 +79,68 @@ public class KeycloakUtils : IKeycloakUtils
         };
 
         var tokenResponse = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
-            new FormUrlEncodedContent(tokenRequestParameters));
+            new FormUrlEncodedContent(requestContent));
 
         if (!tokenResponse.IsSuccessStatusCode)
-            throw new ApplicationException("Access token not received");
+            throw new ApplicationException($"Access token not received. Status Code: {tokenResponse.StatusCode}");
             
         return await tokenResponse.Content.ReadAsStringAsync();
+    }
+
+    public async Task<string> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
+    {
+        var checkRefreshToken = await CheckRefreshToken(refreshTokenRequestDto);
+        
+        if (!checkRefreshToken.IsSuccessStatusCode)
+            throw new ApplicationException($"Invalid refresh token. Status Code: {checkRefreshToken.StatusCode}");
+        
+        using var httpClient = _httpClientFactory.CreateClient();
+        var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            { "grant_type", "refresh_token" },
+            { "client_id", _config["Keycloak:ClientId"] },
+            { "refresh_token", refreshTokenRequestDto.RefreshToken }
+        });
+        
+        var tokenResponse = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], requestContent);
+
+        if (!tokenResponse.IsSuccessStatusCode)
+            throw new ApplicationException($"Access token not received. Status Code: {tokenResponse.StatusCode}");
+        
+        return await tokenResponse.Content.ReadAsStringAsync();
+    }
+
+    public async Task LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto)
+    {
+        var checkRefreshToken = await CheckRefreshToken(refreshTokenRequestDto);
+        
+        if (!checkRefreshToken.IsSuccessStatusCode)
+            throw new ApplicationException("Invalid refresh token");
+        
+        using var httpClient = _httpClientFactory.CreateClient();
+        var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            { "refresh_token", refreshTokenRequestDto.RefreshToken },
+            { "client_id", _config["Keycloak:ClientId"] }
+        });
+        
+        var response = await httpClient.PostAsync(_config["Keycloak:LogoutUrl"], requestContent);
+        
+        if (!response.IsSuccessStatusCode)
+            throw new ApplicationException($"Logout failed. Status Code: {response.StatusCode}");
+    }
+
+    private async Task<HttpResponseMessage> CheckRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
+    {
+        using var httpClient = _httpClientFactory.CreateClient();
+        var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            { "token", refreshTokenRequestDto.RefreshToken },
+            { "client_id", _config["Keycloak:ManageClientId"] },
+            { "client_secret", _config["Keycloak:ClientSecret"] }
+        });
+        
+        return await httpClient.PostAsync(_config["Keycloak:ValidationUrl"], requestContent);
     }
 
     private Credentials CreatePasswordCredentials(string password)

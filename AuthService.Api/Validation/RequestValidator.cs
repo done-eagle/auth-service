@@ -20,11 +20,11 @@ internal static class RequestValidator
             throw new ApplicationException("Incorrect password");
     }
 
-    public static void ValidateRequest(GetAccessTokenRequestDto userRequestDto)
+    public static void ValidateRequest(GetAccessTokenRequestDto getAccessTokenRequestDto)
     {
-        if (userRequestDto.AuthCode is null or "")
+        if (getAccessTokenRequestDto.AuthCode is null or "")
             throw new ApplicationException("Incorrect authorization_code");
-        if (userRequestDto.CodeVerifier is null or "")
+        if (getAccessTokenRequestDto.CodeVerifier is null or "")
             throw new ApplicationException("Incorrect code_verifier");
     }
 
@@ -42,5 +42,11 @@ internal static class RequestValidator
             throw new ApplicationException("Incorrect email");
         if (userRequestDto.Password is null or "")
             throw new ApplicationException("Incorrect password");
+    }
+
+    public static void ValidateRequest(RefreshTokenRequestDto refreshTokenRequestDto)
+    {
+        if (refreshTokenRequestDto.RefreshToken is null or "")
+            throw new ApplicationException("Incorrect refresh token");
     }
 }

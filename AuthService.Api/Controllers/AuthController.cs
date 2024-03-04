@@ -19,7 +19,6 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost]
-    [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] CreateUserRequestDto userRequestDto)
     {
         try
@@ -42,7 +41,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] GetAccessTokenRequestDto userRequestDto)
     {
         try
@@ -63,9 +61,42 @@ public class AuthController : ControllerBase
     }
     
     [HttpGet]
-    [Authorize(Roles = "user")]
-    public IActionResult Logout()
+    public async Task<IActionResult> GetAccessTokenByRefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
     {
-        return Ok("Logout");
+        try
+        {
+            RequestValidator.ValidateRequest(refreshTokenRequestDto);
+            var token = await _keycloakUtils.GetAccessTokenByRefreshToken(refreshTokenRequestDto);
+            return Content(token, "application/json");
+        }
+        catch (ApplicationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (FlurlHttpException ex)
+        {
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
+        }
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> Logout(RefreshTokenRequestDto refreshTokenRequestDto)
+    {
+        try
+        {
+            RequestValidator.ValidateRequest(refreshTokenRequestDto);
+            await _keycloakUtils.LogoutUser(refreshTokenRequestDto);
+            return Ok("Logout successful");
+        }
+        catch (ApplicationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (FlurlHttpException ex)
+        {
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
+        }
     }
 }
