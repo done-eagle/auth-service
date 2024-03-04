@@ -66,7 +66,7 @@ public class KeycloakUtils : IKeycloakUtils
         await _keycloakClient.DeleteUserAsync(_config[RealmConfigKey], findUserByIdRequestDto.UserId);
     }
     
-    public async Task<string> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto)
+    public async Task<GetAccessTokenResponseDto> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto)
     {
         using var httpClient = _httpClientFactory.CreateClient();
         var requestContent = new Dictionary<string, string>
@@ -78,21 +78,19 @@ public class KeycloakUtils : IKeycloakUtils
             { "code_verifier", getAccessTokenRequestDto.CodeVerifier },
         };
 
-        var tokenResponse = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
+       var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
             new FormUrlEncodedContent(requestContent));
 
-        if (!tokenResponse.IsSuccessStatusCode)
-            throw new ApplicationException($"Access token not received. Status Code: {tokenResponse.StatusCode}");
-            
-        return await tokenResponse.Content.ReadAsStringAsync();
+       return new GetAccessTokenResponseDto((int)response.StatusCode, 
+           await response.Content.ReadAsStringAsync());
     }
 
-    public async Task<string> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
+    public async Task<GetAccessTokenResponseDto> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
     {
-        var checkRefreshToken = await CheckRefreshToken(refreshTokenRequestDto);
-        
-        if (!checkRefreshToken.IsSuccessStatusCode)
-            throw new ApplicationException($"Invalid refresh token. Status Code: {checkRefreshToken.StatusCode}");
+        var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
+
+        if (!checkRefreshTokenResponse.IsSuccessStatusCode)
+            return new GetAccessTokenResponseDto((int)checkRefreshTokenResponse.StatusCode, "");
         
         using var httpClient = _httpClientFactory.CreateClient();
         var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -102,20 +100,18 @@ public class KeycloakUtils : IKeycloakUtils
             { "refresh_token", refreshTokenRequestDto.RefreshToken }
         });
         
-        var tokenResponse = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], requestContent);
+        var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], requestContent);
 
-        if (!tokenResponse.IsSuccessStatusCode)
-            throw new ApplicationException($"Access token not received. Status Code: {tokenResponse.StatusCode}");
-        
-        return await tokenResponse.Content.ReadAsStringAsync();
+        return new GetAccessTokenResponseDto((int)response.StatusCode,
+            await response.Content.ReadAsStringAsync());
     }
 
-    public async Task LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto)
+    public async Task<GetAccessTokenResponseDto> LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto)
     {
-        var checkRefreshToken = await CheckRefreshToken(refreshTokenRequestDto);
+        var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
         
-        if (!checkRefreshToken.IsSuccessStatusCode)
-            throw new ApplicationException("Invalid refresh token");
+        if (!checkRefreshTokenResponse.IsSuccessStatusCode)
+            return new GetAccessTokenResponseDto((int)checkRefreshTokenResponse.StatusCode, "");
         
         using var httpClient = _httpClientFactory.CreateClient();
         var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -125,9 +121,8 @@ public class KeycloakUtils : IKeycloakUtils
         });
         
         var response = await httpClient.PostAsync(_config["Keycloak:LogoutUrl"], requestContent);
-        
-        if (!response.IsSuccessStatusCode)
-            throw new ApplicationException($"Logout failed. Status Code: {response.StatusCode}");
+
+        return new GetAccessTokenResponseDto((int)response.StatusCode, "");
     }
 
     private async Task<HttpResponseMessage> CheckRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
