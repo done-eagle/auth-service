@@ -11,8 +11,11 @@ services:
       - DB_DATABASE=keycloak
       - DB_USER=keycloak
       - DB_PASSWORD=password
+      - KEYCLOAK_IMPORT=/path/in/container/realm-export.json
+    volumes:
+      - ./realm-export.json:/path/in/container/realm-export.json
     ports:
-      - "8080:8080"
+      - "8180:8080"
     depends_on:
       - db
 
