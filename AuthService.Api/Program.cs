@@ -49,7 +49,7 @@ builder.Services.AddSingleton<IKeycloakUtils>(provider =>
 
     return new KeycloakUtils(
         configuration["Keycloak:ServerUrl"],
-        configuration["Keycloak:ClientId"],
+        configuration["Keycloak:ManageClientId"],
         configuration["Keycloak:ClientSecret"],
         mapper,
         configuration,

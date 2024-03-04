@@ -33,9 +33,10 @@ public class AdminController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (FlurlHttpException)
+        catch (FlurlHttpException ex)
         {
-            return Conflict("User with such data already exist");
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
         }
     }
 
@@ -52,9 +53,10 @@ public class AdminController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (FlurlHttpException)
+        catch (FlurlHttpException ex)
         {
-            return NotFound($"User with userId: {findUserByIdRequestDto.UserId} not found");
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
         }
     }
 
@@ -71,9 +73,10 @@ public class AdminController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (FlurlHttpException)
+        catch (FlurlHttpException ex)
         {
-            return NotFound($"User with userId: {updateUserRequestDto.UserId} not found");
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
         }
     }
 
@@ -90,9 +93,10 @@ public class AdminController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (FlurlHttpException)
+        catch (FlurlHttpException ex)
         {
-            return NotFound($"User with userId: {findUserByIdRequestDto.UserId} not found");
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
         }
     }
 }

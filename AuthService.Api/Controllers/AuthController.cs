@@ -34,10 +34,10 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (Exception ex)
+        catch (FlurlHttpException ex)
         {
-            //return Conflict("User with such data already exist");
-            return BadRequest(ex.Message);
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
         }
     }
 
@@ -54,6 +54,11 @@ public class AuthController : ControllerBase
         catch (ApplicationException ex)
         {
             return BadRequest(ex.Message);
+        }
+        catch (FlurlHttpException ex)
+        {
+            var statusCode = (int)ex.StatusCode!;
+            return StatusCode(statusCode);
         }
     }
     

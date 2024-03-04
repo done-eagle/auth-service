@@ -66,25 +66,23 @@ public class KeycloakUtils : IKeycloakUtils
     
     public async Task<string> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto)
     {
-        using (var httpClient = _httpClientFactory.CreateClient())
+        using var httpClient = _httpClientFactory.CreateClient();
+        var tokenRequestParameters = new Dictionary<string, string>
         {
-            var tokenRequestParameters = new Dictionary<string, string>
-            {
-                { "grant_type", "authorization_code" },
-                { "client_id", _config["Keycloak:ClientId"] },
-                { "code", getAccessTokenRequestDto.AuthCode },
-                { "redirect_uri", "https://localhost:8080/redirect" },
-                { "code_verifier", getAccessTokenRequestDto.CodeVerifier },
-            };
+            { "grant_type", "authorization_code" },
+            { "client_id", _config["Keycloak:ClientId"] },
+            { "code", getAccessTokenRequestDto.AuthCode },
+            { "redirect_uri", _config["Keycloak:RedirectUri"] },
+            { "code_verifier", getAccessTokenRequestDto.CodeVerifier },
+        };
 
-            var tokenResponse = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
-                new FormUrlEncodedContent(tokenRequestParameters));
+        var tokenResponse = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
+            new FormUrlEncodedContent(tokenRequestParameters));
 
-            if (!tokenResponse.IsSuccessStatusCode)
-                throw new ApplicationException("Access token not received");
+        if (!tokenResponse.IsSuccessStatusCode)
+            throw new ApplicationException("Access token not received");
             
-            return await tokenResponse.Content.ReadAsStringAsync();
-        }
+        return await tokenResponse.Content.ReadAsStringAsync();
     }
 
     private Credentials CreatePasswordCredentials(string password)
