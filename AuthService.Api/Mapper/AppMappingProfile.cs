@@ -9,7 +9,7 @@ public class AppMappingProfile : Profile
 {
     public AppMappingProfile()
     {
-        CreateMap<User, FindUserByIdResponseDto>();
+        CreateMap<User, UserResponseDto>();
         CreateMap<CreateUserRequestDto, User>();
     }
 }

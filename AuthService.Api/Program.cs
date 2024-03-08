@@ -1,7 +1,9 @@
 using AuthService.Api.Keycloak;
 using AuthService.Api.Mapper;
+using AuthService.Api.Validators;
 using AuthService.Api.Сonverters;
 using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -9,6 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<FindUserByIdDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<GetAccessTokenDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RefreshTokenDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserDtoValidator>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));

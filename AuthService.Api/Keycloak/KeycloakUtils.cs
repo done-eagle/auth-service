@@ -1,4 +1,4 @@
-using System.Net;
+using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Dto.Response;
 using AutoMapper;
@@ -30,40 +30,72 @@ public class KeycloakUtils : IKeycloakUtils
             ));
     }
 
-    public async Task<string> CreateUser(CreateUserRequestDto createUserRequestDto)
+    public async Task<KeycloakResponseDto> CreateUser(CreateUserRequestDto createUserRequestDto)
     {
-        var credential = CreatePasswordCredentials(createUserRequestDto.Password);
-        var user = _mapper.Map<User>(createUserRequestDto);
+        try
+        {
+            var credential = CreatePasswordCredentials(createUserRequestDto.Password);
+            var user = _mapper.Map<User>(createUserRequestDto);
         
-        user.Enabled = true;
-        user.EmailVerified = false;
-        user.Credentials = new[] { credential };
+            user.Enabled = true;
+            user.EmailVerified = false;
+            user.Credentials = new[] { credential };
         
-        var response = await _keycloakClient.CreateAndRetrieveUserIdAsync(_config[RealmConfigKey], user);
+            var createdUserId = await _keycloakClient.CreateAndRetrieveUserIdAsync(_config[RealmConfigKey], user);
+            Console.WriteLine($"User created with userId: {createdUserId}");
 
-        return response;
+            return new KeycloakResponseDto(CodesData.CreatedCode);
+        }
+        catch (FlurlHttpException ex)
+        {
+            return new KeycloakResponseDto((int)ex.StatusCode!);
+        }
     }
 
     public async Task<FindUserByIdResponseDto> FindById(FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        var user = await _keycloakClient.GetUserAsync(_config[RealmConfigKey], findUserByIdRequestDto.UserId);
-        return _mapper.Map<FindUserByIdResponseDto>(user);
+        try
+        {
+            var user = await _keycloakClient.GetUserAsync(_config[RealmConfigKey], findUserByIdRequestDto.UserId);
+            var userDto = _mapper.Map<UserResponseDto>(user);
+            return new FindUserByIdResponseDto(CodesData.SuccessCode, userDto);
+        }
+        catch (FlurlHttpException ex)
+        {
+            return new FindUserByIdResponseDto((int)ex.StatusCode!, null!);
+        }
     }
 
-    public async Task UpdateUser(UpdateUserRequestDto updateUserRequestDto)
+    public async Task<KeycloakResponseDto> UpdateUser(UpdateUserRequestDto updateUserRequestDto)
     {
-        var user = await _keycloakClient.GetUserAsync(_config[RealmConfigKey], updateUserRequestDto.UserId);
-        var credential = CreatePasswordCredentials(updateUserRequestDto.Password);
+        try
+        {
+            var user = await _keycloakClient.GetUserAsync(_config[RealmConfigKey], updateUserRequestDto.UserId);
+            var credential = CreatePasswordCredentials(updateUserRequestDto.Password);
         
-        user.Email = updateUserRequestDto.Email;
-        user.Credentials = new[] { credential };
+            user.Email = updateUserRequestDto.Email;
+            user.Credentials = new[] { credential };
         
-        await _keycloakClient.UpdateUserAsync(_config[RealmConfigKey], updateUserRequestDto.UserId, user);
+            await _keycloakClient.UpdateUserAsync(_config[RealmConfigKey], updateUserRequestDto.UserId, user);
+            return new KeycloakResponseDto(CodesData.SuccessCode);
+        }
+        catch (FlurlHttpException ex)
+        {
+            return new KeycloakResponseDto((int)ex.StatusCode!);
+        }
     }
 
-    public async Task DeleteUser(FindUserByIdRequestDto findUserByIdRequestDto)
+    public async Task<KeycloakResponseDto> DeleteUser(FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        await _keycloakClient.DeleteUserAsync(_config[RealmConfigKey], findUserByIdRequestDto.UserId);
+        try
+        {
+            await _keycloakClient.DeleteUserAsync(_config[RealmConfigKey], findUserByIdRequestDto.UserId);
+            return new KeycloakResponseDto(CodesData.SuccessCode);
+        }
+        catch (FlurlHttpException ex)
+        {
+            return new KeycloakResponseDto((int)ex.StatusCode!);
+        }
     }
     
     public async Task<GetAccessTokenResponseDto> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto)
@@ -78,11 +110,11 @@ public class KeycloakUtils : IKeycloakUtils
             { "code_verifier", getAccessTokenRequestDto.CodeVerifier },
         };
 
-       var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
+        var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
             new FormUrlEncodedContent(requestContent));
 
-       return new GetAccessTokenResponseDto((int)response.StatusCode, 
-           await response.Content.ReadAsStringAsync());
+        return new GetAccessTokenResponseDto((int)response.StatusCode, 
+            await response.Content.ReadAsStringAsync());
     }
 
     public async Task<GetAccessTokenResponseDto> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
@@ -106,12 +138,12 @@ public class KeycloakUtils : IKeycloakUtils
             await response.Content.ReadAsStringAsync());
     }
 
-    public async Task<GetAccessTokenResponseDto> LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto)
+    public async Task<KeycloakResponseDto> LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto)
     {
         var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
         
         if (!checkRefreshTokenResponse.IsSuccessStatusCode)
-            return new GetAccessTokenResponseDto((int)checkRefreshTokenResponse.StatusCode, "");
+            return new KeycloakResponseDto((int)checkRefreshTokenResponse.StatusCode);
         
         using var httpClient = _httpClientFactory.CreateClient();
         var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -122,7 +154,7 @@ public class KeycloakUtils : IKeycloakUtils
         
         var response = await httpClient.PostAsync(_config["Keycloak:LogoutUrl"], requestContent);
 
-        return new GetAccessTokenResponseDto((int)response.StatusCode, "");
+        return new KeycloakResponseDto((int)response.StatusCode);
     }
 
     private async Task<HttpResponseMessage> CheckRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)

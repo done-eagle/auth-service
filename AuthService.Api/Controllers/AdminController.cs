@@ -1,6 +1,6 @@
+using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Keycloak;
-using AuthService.Api.Validation;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,81 +22,44 @@ public class AdminController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] CreateUserRequestDto createUserRequestDto)
     {
-        try
-        {
-            RequestValidator.ValidateRequest(createUserRequestDto);
-            var createdUserId = await _keycloakUtils.CreateUser(createUserRequestDto);
-            Console.WriteLine($"User created with userId: {createdUserId}");
-            return Ok();
-        }
-        catch (ApplicationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (FlurlHttpException ex)
-        {
-            var statusCode = (int)ex.StatusCode!;
-            return StatusCode(statusCode);
-        }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        var responseDto = await _keycloakUtils.CreateUser(createUserRequestDto);
+        return StatusCode(responseDto.StatusCode);
     }
 
     [HttpGet]
     public async Task<IActionResult> FindById([FromBody] FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        try
-        {
-            RequestValidator.ValidateRequest(findUserByIdRequestDto);
-            var userResponseDto = await _keycloakUtils.FindById(findUserByIdRequestDto);
-            return Ok(userResponseDto);
-        }
-        catch (ApplicationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (FlurlHttpException ex)
-        {
-            var statusCode = (int)ex.StatusCode!;
-            return StatusCode(statusCode);
-        }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        var responseDto = await _keycloakUtils.FindById(findUserByIdRequestDto);
+        
+        if (responseDto.StatusCode != CodesData.SuccessCode)
+            return StatusCode(responseDto.StatusCode);
+        
+        return Ok(responseDto.UserResponseDto);
     }
 
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateUserRequestDto updateUserRequestDto)
     {
-        try
-        {
-            RequestValidator.ValidateRequest(updateUserRequestDto);
-            await _keycloakUtils.UpdateUser(updateUserRequestDto);
-            return Ok();
-        }
-        catch (ApplicationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (FlurlHttpException ex)
-        {
-            var statusCode = (int)ex.StatusCode!;
-            return StatusCode(statusCode);
-        }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        var responseDto = await _keycloakUtils.UpdateUser(updateUserRequestDto);
+        return StatusCode(responseDto.StatusCode);
     }
 
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        try
-        {
-            RequestValidator.ValidateRequest(findUserByIdRequestDto);
-            await _keycloakUtils.DeleteUser(findUserByIdRequestDto);
-            return Ok();
-        }
-        catch (ApplicationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (FlurlHttpException ex)
-        {
-            var statusCode = (int)ex.StatusCode!;
-            return StatusCode(statusCode);
-        }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        await _keycloakUtils.DeleteUser(findUserByIdRequestDto);
+        return Ok();
     }
 }
