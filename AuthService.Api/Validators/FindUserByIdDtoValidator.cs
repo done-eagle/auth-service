@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace AuthService.Api.Validators;
 
-public abstract class FindUserByIdDtoValidator : AbstractValidator<FindUserByIdRequestDto>
+public class FindUserByIdDtoValidator : AbstractValidator<FindUserByIdRequestDto>
 {
-    protected FindUserByIdDtoValidator()
+    public FindUserByIdDtoValidator()
     {
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("Incorrect userId");

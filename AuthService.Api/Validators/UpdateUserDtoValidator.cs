@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace AuthService.Api.Validators;
 
-public abstract class UpdateUserDtoValidator : AbstractValidator<UpdateUserRequestDto>
+public class UpdateUserDtoValidator : AbstractValidator<UpdateUserRequestDto>
 {
-    protected UpdateUserDtoValidator()
+    public UpdateUserDtoValidator()
     {
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("Incorrect userId");

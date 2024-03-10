@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace AuthService.Api.Validators;
 
-public abstract class CreateUserDtoValidator : AbstractValidator<CreateUserRequestDto>
+public class CreateUserDtoValidator : AbstractValidator<CreateUserRequestDto>
 {
-    protected CreateUserDtoValidator()
+    public CreateUserDtoValidator()
     {
         RuleFor(x => x.Username)
             .NotEmpty().WithMessage("Incorrect username");

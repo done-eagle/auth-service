@@ -1,6 +1,7 @@
 using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Keycloak;
+using AuthService.Api.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Api.Controllers;
@@ -19,8 +20,11 @@ public class AuthController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] CreateUserRequestDto userRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new CreateUserDtoValidator();
+        var validationResult = await validator.ValidateAsync(userRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         var responseDto = await _keycloakUtils.CreateUser(userRequestDto);
         return StatusCode(responseDto.StatusCode);
@@ -29,8 +33,11 @@ public class AuthController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Login([FromBody] GetAccessTokenRequestDto userRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new GetAccessTokenDtoValidator();
+        var validationResult = await validator.ValidateAsync(userRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         var accessTokenResponse = await _keycloakUtils.GetAccessToken(userRequestDto);
 
@@ -43,8 +50,11 @@ public class AuthController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAccessTokenByRefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new RefreshTokenDtoValidator();
+        var validationResult = await validator.ValidateAsync(refreshTokenRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         var accessTokenResponse = await _keycloakUtils.GetAccessTokenByRefreshToken(refreshTokenRequestDto);
         
@@ -57,8 +67,11 @@ public class AuthController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Logout(RefreshTokenRequestDto refreshTokenRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new RefreshTokenDtoValidator();
+        var validationResult = await validator.ValidateAsync(refreshTokenRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         var logoutResponse = await _keycloakUtils.LogoutUser(refreshTokenRequestDto);
         

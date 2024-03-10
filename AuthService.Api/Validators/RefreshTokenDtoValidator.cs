@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace AuthService.Api.Validators;
 
-public abstract class RefreshTokenDtoValidator : AbstractValidator<RefreshTokenRequestDto>
+public class RefreshTokenDtoValidator : AbstractValidator<RefreshTokenRequestDto>
 {
-    protected RefreshTokenDtoValidator()
+    public RefreshTokenDtoValidator()
     {
         RuleFor(x => x.RefreshToken)
             .NotEmpty().WithMessage("Incorrect refresh token");

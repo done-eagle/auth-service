@@ -1,6 +1,7 @@
 using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Keycloak;
+using AuthService.Api.Validators;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,11 @@ public class AdminController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] CreateUserRequestDto createUserRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new CreateUserDtoValidator();
+        var validationResult = await validator.ValidateAsync(createUserRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         var responseDto = await _keycloakUtils.CreateUser(createUserRequestDto);
         return StatusCode(responseDto.StatusCode);
@@ -32,8 +36,11 @@ public class AdminController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> FindById([FromBody] FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new FindUserByIdDtoValidator();
+        var validationResult = await validator.ValidateAsync(findUserByIdRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         var responseDto = await _keycloakUtils.FindById(findUserByIdRequestDto);
         
@@ -46,8 +53,11 @@ public class AdminController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateUserRequestDto updateUserRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new UpdateUserDtoValidator();
+        var validationResult = await validator.ValidateAsync(updateUserRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         var responseDto = await _keycloakUtils.UpdateUser(updateUserRequestDto);
         return StatusCode(responseDto.StatusCode);
@@ -56,8 +66,11 @@ public class AdminController : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] FindUserByIdRequestDto findUserByIdRequestDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var validator = new FindUserByIdDtoValidator();
+        var validationResult = await validator.ValidateAsync(findUserByIdRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
         
         await _keycloakUtils.DeleteUser(findUserByIdRequestDto);
         return Ok();

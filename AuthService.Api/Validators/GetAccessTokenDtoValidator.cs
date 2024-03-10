@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace AuthService.Api.Validators;
 
-public abstract class GetAccessTokenDtoValidator : AbstractValidator<GetAccessTokenRequestDto>
+public class GetAccessTokenDtoValidator : AbstractValidator<GetAccessTokenRequestDto>
 {
-    protected GetAccessTokenDtoValidator()
+    public GetAccessTokenDtoValidator()
     {
         RuleFor(x => x.AuthCode)
             .NotEmpty().WithMessage("Incorrect authorization_code");
