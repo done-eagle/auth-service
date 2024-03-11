@@ -5,7 +5,7 @@ namespace AuthService.Api.Keycloak;
 
 public interface IKeycloakUtils
 {
-    Task<KeycloakResponseDto> CreateUser(CreateUserRequestDto createUserRequestDto);
+    Task<CreateUserResponseDto> CreateUser(CreateUserRequestDto createUserRequestDto);
     Task<GetAccessTokenResponseDto> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto);
     Task<GetAccessTokenResponseDto> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto);
     Task<KeycloakResponseDto> LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto);

@@ -30,7 +30,7 @@ public class KeycloakUtils : IKeycloakUtils
             ));
     }
 
-    public async Task<KeycloakResponseDto> CreateUser(CreateUserRequestDto createUserRequestDto)
+    public async Task<CreateUserResponseDto> CreateUser(CreateUserRequestDto createUserRequestDto)
     {
         try
         {
@@ -44,11 +44,11 @@ public class KeycloakUtils : IKeycloakUtils
             var createdUserId = await _keycloakClient.CreateAndRetrieveUserIdAsync(_config[RealmConfigKey], user);
             Console.WriteLine($"User created with userId: {createdUserId}");
 
-            return new KeycloakResponseDto(CodesData.CreatedCode);
+            return new CreateUserResponseDto(CodesData.CreatedCode, createdUserId);
         }
         catch (FlurlHttpException ex)
         {
-            return new KeycloakResponseDto((int)ex.StatusCode!);
+            return new CreateUserResponseDto((int)ex.StatusCode!, "");
         }
     }
 

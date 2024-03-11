@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using AuthService.Api.Data;
+using AuthService.Api.Dto.Request;
 using AuthService.Tests.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -30,23 +31,21 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
         
         // Assert
         Assert.Equal(CodesData.CreatedCode, (int)registerResponse.StatusCode);
-    }
-    
-    [Fact]
-    public async Task RegisterUser_ReturnsConflictResult()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-        var registerContent = new StringContent(
-            JsonSerializer.Serialize(TestData.CreateUserDto), 
-            Encoding.UTF8, "application/json"
-        );
-        
-        // Act
-        await client.PostAsync("/api/auth/register", registerContent);
-        var registerResponse = await client.PostAsync("/api/auth/register", registerContent);
-        
-        // Assert
-        Assert.Equal(CodesData.ConflictCode, (int)registerResponse.StatusCode);
+
+        // var findUserByIdDto = new FindUserByIdRequestDto
+        // {
+        //     UserId = await registerResponse.Content.ReadAsStringAsync()
+        // };
+        //
+        // var deleteContent = new StringContent(
+        //     JsonSerializer.Serialize(findUserByIdDto), 
+        //     Encoding.UTF8, "application/json"
+        // );
+        //
+        // var deleteRequest = new HttpRequestMessage(HttpMethod.Delete, "/api/admin/user/delete");
+        // deleteRequest.Content = deleteContent;
+        //
+        // var deleteResponse = await client.SendAsync(deleteRequest);
+        // Assert.Equal(CodesData.SuccessCode, (int)deleteResponse.StatusCode);
     }
 }

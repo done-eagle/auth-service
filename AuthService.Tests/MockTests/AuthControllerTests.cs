@@ -167,7 +167,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.CreateUser(TestData.CreateUserDto))
-            .Returns(Task.FromResult(new KeycloakResponseDto(CodesData.CreatedCode)));
+            .Returns(Task.FromResult(new CreateUserResponseDto(CodesData.CreatedCode, "userId")));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -175,8 +175,9 @@ public class AuthControllerTests
         var result = await authController.Register(TestData.CreateUserDto);
         
         // Assert
-        var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
-        Assert.Equal(CodesData.CreatedCode, statusCodeResult.StatusCode);
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(CodesData.CreatedCode, objectResult.StatusCode);
+        Assert.Equal("userId", objectResult.Value);
     }
 
     [Fact]
@@ -186,7 +187,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.CreateUser(TestData.CreateUserDto))
-            .Returns(Task.FromResult(new KeycloakResponseDto(CodesData.ConflictCode)));
+            .Returns(Task.FromResult(new CreateUserResponseDto(CodesData.ConflictCode, "")));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -194,8 +195,8 @@ public class AuthControllerTests
         var result = await authController.Register(TestData.CreateUserDto);
         
         // Assert
-        var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
-        Assert.Equal(CodesData.ConflictCode, statusCodeResult.StatusCode);
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(CodesData.ConflictCode, objectResult.StatusCode);
     }
 
     [Fact]

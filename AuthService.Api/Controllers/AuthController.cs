@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
             return BadRequest(validationResult.Errors);
         
         var responseDto = await _keycloakUtils.CreateUser(userRequestDto);
-        return StatusCode(responseDto.StatusCode);
+        return StatusCode(responseDto.StatusCode, responseDto.Id);
     }
 
     [HttpGet]
