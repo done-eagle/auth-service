@@ -4,16 +4,17 @@ using AuthService.Api.Dto.Request;
 using AuthService.Api.Dto.Response;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace AuthService.Tests;
 
 internal static class TestHelper
 {
-    internal static async Task CleanupAsync(WebApplicationFactory<Program> factory, string userId)
+    internal static async Task CleanupAsync(WebApplicationFactory<Program> factory, 
+        IHttpClientFactory httpClientFactory,
+        IConfiguration config,
+        string userId)
     {
-        var config = factory.Services.GetRequiredService<IConfiguration>();
         var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             { "grant_type", "client_credentials" },
@@ -21,7 +22,7 @@ internal static class TestHelper
             { "client_secret", config["Keycloak:ClientSecret"] }
         });
 
-        using var httpClient = new HttpClient();
+        using var httpClient = httpClientFactory.CreateClient();
         var tokenResponse = await httpClient.PostAsync(config["Keycloak:TokenUrl"], requestContent);
         
         var responseContent = await tokenResponse.Content.ReadAsStringAsync();
