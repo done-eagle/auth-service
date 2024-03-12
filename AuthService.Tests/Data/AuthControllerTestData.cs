@@ -3,7 +3,7 @@ using AuthService.Api.Dto.Response;
 
 namespace AuthService.Tests.Data;
 
-internal static class TestData
+internal static class AuthControllerTestData
 {
     internal static readonly CreateUserRequestDto CreateUserDto = new CreateUserRequestDto
     {

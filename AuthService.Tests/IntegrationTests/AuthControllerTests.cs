@@ -1,15 +1,15 @@
 using System.Text;
-using System.Text.Json;
 using AuthService.Api.Data;
-using AuthService.Api.Dto.Request;
 using AuthService.Tests.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Newtonsoft.Json;
 
 namespace AuthService.Tests.IntegrationTests;
 
-public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
+public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
 {
     private readonly WebApplicationFactory<Program> _factory;
+    private string UserId { get; set; } = null!;
 
     public AuthControllerTests(WebApplicationFactory<Program> factory)
     {
@@ -20,32 +20,22 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task RegisterUser_ReturnsCreatedResult()
     {
         // Arrange
-        var client = _factory.CreateClient();
+        using var client = _factory.CreateClient();
         var registerContent = new StringContent(
-            JsonSerializer.Serialize(TestData.CreateUserDto), 
+            JsonConvert.SerializeObject(AuthControllerTestData.CreateUserDto), 
             Encoding.UTF8, "application/json"
         );
         
         // Act
         var registerResponse = await client.PostAsync("/api/auth/register", registerContent);
+        UserId = await registerResponse.Content.ReadAsStringAsync();
         
         // Assert
         Assert.Equal(CodesData.CreatedCode, (int)registerResponse.StatusCode);
-
-        // var findUserByIdDto = new FindUserByIdRequestDto
-        // {
-        //     UserId = await registerResponse.Content.ReadAsStringAsync()
-        // };
-        //
-        // var deleteContent = new StringContent(
-        //     JsonSerializer.Serialize(findUserByIdDto), 
-        //     Encoding.UTF8, "application/json"
-        // );
-        //
-        // var deleteRequest = new HttpRequestMessage(HttpMethod.Delete, "/api/admin/user/delete");
-        // deleteRequest.Content = deleteContent;
-        //
-        // var deleteResponse = await client.SendAsync(deleteRequest);
-        // Assert.Equal(CodesData.SuccessCode, (int)deleteResponse.StatusCode);
+    }
+    
+    public void Dispose()
+    {
+        TestHelper.CleanupAsync(_factory, UserId).GetAwaiter().GetResult();
     }
 }

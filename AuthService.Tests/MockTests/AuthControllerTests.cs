@@ -18,7 +18,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDtoWrongUsername);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDtoWrongUsername);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -33,7 +33,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDtoWrongFirstName);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDtoWrongFirstName);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -48,7 +48,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDtoWrongLastName);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDtoWrongLastName);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -63,7 +63,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDtoWrongPhoneNumber);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDtoWrongPhoneNumber);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -78,7 +78,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDtoWrongEmail);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDtoWrongEmail);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -93,7 +93,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDtoWrongPassword);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDtoWrongPassword);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -108,7 +108,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Login(TestData.GetAccessTokenDtoWrongAuthCode);
+        var result = await authController.Login(AuthControllerTestData.GetAccessTokenDtoWrongAuthCode);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -123,7 +123,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Login(TestData.GetAccessTokenDtoWrongCodeVerifier);
+        var result = await authController.Login(AuthControllerTestData.GetAccessTokenDtoWrongCodeVerifier);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -138,7 +138,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.GetAccessTokenByRefreshToken(TestData.RefreshTokenDtoWrongRT);
+        var result = await authController.GetAccessTokenByRefreshToken(AuthControllerTestData.RefreshTokenDtoWrongRT);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -153,7 +153,7 @@ public class AuthControllerTests
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Logout(TestData.RefreshTokenDtoWrongRT);
+        var result = await authController.Logout(AuthControllerTestData.RefreshTokenDtoWrongRT);
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -166,13 +166,13 @@ public class AuthControllerTests
         // Arrange
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
-                x.CreateUser(TestData.CreateUserDto))
+                x.CreateUser(AuthControllerTestData.CreateUserDto))
             .Returns(Task.FromResult(new CreateUserResponseDto(CodesData.CreatedCode, "userId")));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDto);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDto);
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
@@ -186,13 +186,13 @@ public class AuthControllerTests
         // Arrange
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
-                x.CreateUser(TestData.CreateUserDto))
+                x.CreateUser(AuthControllerTestData.CreateUserDto))
             .Returns(Task.FromResult(new CreateUserResponseDto(CodesData.ConflictCode, "")));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Register(TestData.CreateUserDto);
+        var result = await authController.Register(AuthControllerTestData.CreateUserDto);
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
@@ -205,17 +205,17 @@ public class AuthControllerTests
         // Arrange
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
-                x.GetAccessToken(TestData.GetAccessTokenDto))
-            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.SuccessCode, TestData.AccessTokenResponseDto)));
+                x.GetAccessToken(AuthControllerTestData.GetAccessTokenDto))
+            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.SuccessCode, AuthControllerTestData.AccessTokenResponseDto)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Login(TestData.GetAccessTokenDto);
+        var result = await authController.Login(AuthControllerTestData.GetAccessTokenDto);
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(TestData.AccessTokenResponseDto, objectResult.Value);
+        Assert.Equal(AuthControllerTestData.AccessTokenResponseDto, objectResult.Value);
     }
     
     [Fact]
@@ -224,13 +224,13 @@ public class AuthControllerTests
         // Arrange
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
-                x.GetAccessToken(TestData.GetAccessTokenDto))
+                x.GetAccessToken(AuthControllerTestData.GetAccessTokenDto))
             .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.Unauthorized, null!)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Login(TestData.GetAccessTokenDto);
+        var result = await authController.Login(AuthControllerTestData.GetAccessTokenDto);
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
@@ -243,17 +243,17 @@ public class AuthControllerTests
         // Arrange
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
-                x.GetAccessTokenByRefreshToken(TestData.RefreshTokenDto))
-            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.SuccessCode, TestData.AccessTokenResponseDto)));
+                x.GetAccessTokenByRefreshToken(AuthControllerTestData.RefreshTokenDto))
+            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.SuccessCode, AuthControllerTestData.AccessTokenResponseDto)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.GetAccessTokenByRefreshToken(TestData.RefreshTokenDto);
+        var result = await authController.GetAccessTokenByRefreshToken(AuthControllerTestData.RefreshTokenDto);
         
         // Assert
         var contentResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(TestData.AccessTokenResponseDto, contentResult.Value);
+        Assert.Equal(AuthControllerTestData.AccessTokenResponseDto, contentResult.Value);
     }
 
     [Fact]
@@ -262,13 +262,13 @@ public class AuthControllerTests
         // Arrange
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
-                x.GetAccessTokenByRefreshToken(TestData.RefreshTokenDto))
+                x.GetAccessTokenByRefreshToken(AuthControllerTestData.RefreshTokenDto))
             .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.Unauthorized, null!)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.GetAccessTokenByRefreshToken(TestData.RefreshTokenDto);
+        var result = await authController.GetAccessTokenByRefreshToken(AuthControllerTestData.RefreshTokenDto);
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
@@ -281,13 +281,13 @@ public class AuthControllerTests
         // Arrange
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
-                x.LogoutUser(TestData.RefreshTokenDto))
+                x.LogoutUser(AuthControllerTestData.RefreshTokenDto))
             .Returns(Task.FromResult(new KeycloakResponseDto(CodesData.NoContent)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
         // Act
-        var result = await authController.Logout(TestData.RefreshTokenDto);
+        var result = await authController.Logout(AuthControllerTestData.RefreshTokenDto);
         
         // Assert
         var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
