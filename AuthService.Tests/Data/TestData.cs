@@ -1,4 +1,5 @@
 using AuthService.Api.Dto.Request;
+using AuthService.Api.Dto.Response;
 
 namespace AuthService.Tests.Data;
 
@@ -100,5 +101,17 @@ internal static class TestData
     internal static readonly RefreshTokenRequestDto RefreshTokenDtoWrongRT = new RefreshTokenRequestDto
     {
         RefreshToken = ""
+    };
+    
+    internal static readonly AccessTokenResponseDto AccessTokenResponseDto = new AccessTokenResponseDto
+    {
+        ExpiresIn = 10L,
+        IdToken = "IdToken",
+        NotBeforePolicy = 100,
+        RefreshToken = "RefreshToken",
+        Scope = "Scope",
+        SessionState = "SessionState",
+        AccessToken = "AccessToken",
+        TokenType = "TokenType"
     };
 }

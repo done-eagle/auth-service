@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Dto.Response;
@@ -113,8 +114,13 @@ public class KeycloakUtils : IKeycloakUtils
         var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
             new FormUrlEncodedContent(requestContent));
 
-        return new GetAccessTokenResponseDto((int)response.StatusCode, 
-            await response.Content.ReadAsStringAsync());
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var accessTokenDto = JsonSerializer.Deserialize<AccessTokenResponseDto>(responseContent);
+        
+        if (accessTokenDto == null)
+            return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
+
+        return new GetAccessTokenResponseDto((int)response.StatusCode, accessTokenDto);
     }
 
     public async Task<GetAccessTokenResponseDto> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
@@ -122,7 +128,7 @@ public class KeycloakUtils : IKeycloakUtils
         var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
 
         if (!checkRefreshTokenResponse.IsSuccessStatusCode)
-            return new GetAccessTokenResponseDto((int)checkRefreshTokenResponse.StatusCode, "");
+            return new GetAccessTokenResponseDto((int)checkRefreshTokenResponse.StatusCode, null!);
         
         using var httpClient = _httpClientFactory.CreateClient();
         var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
@@ -133,9 +139,13 @@ public class KeycloakUtils : IKeycloakUtils
         });
         
         var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], requestContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var accessTokenDto = JsonSerializer.Deserialize<AccessTokenResponseDto>(responseContent);
+        
+        if (accessTokenDto == null)
+            return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
 
-        return new GetAccessTokenResponseDto((int)response.StatusCode,
-            await response.Content.ReadAsStringAsync());
+        return new GetAccessTokenResponseDto((int)response.StatusCode, accessTokenDto);
     }
 
     public async Task<KeycloakResponseDto> LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto)

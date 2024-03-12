@@ -40,11 +40,7 @@ public class AuthController : ControllerBase
             return BadRequest(validationResult.Errors);
         
         var accessTokenResponse = await _keycloakUtils.GetAccessToken(userRequestDto);
-
-        if (accessTokenResponse.StatusCode != CodesData.SuccessCode)
-            return StatusCode(accessTokenResponse.StatusCode);
-        
-        return Content(accessTokenResponse.AccessToken, "application/json");
+        return StatusCode(accessTokenResponse.StatusCode, accessTokenResponse.AccessTokenResponseDto);
     }
     
     [HttpGet]
@@ -57,11 +53,7 @@ public class AuthController : ControllerBase
             return BadRequest(validationResult.Errors);
         
         var accessTokenResponse = await _keycloakUtils.GetAccessTokenByRefreshToken(refreshTokenRequestDto);
-        
-        if (accessTokenResponse.StatusCode != CodesData.SuccessCode)
-            return StatusCode(accessTokenResponse.StatusCode);
-        
-        return Content(accessTokenResponse.AccessToken, "application/json");
+        return StatusCode(accessTokenResponse.StatusCode, accessTokenResponse.AccessTokenResponseDto);
     }
     
     [HttpGet]

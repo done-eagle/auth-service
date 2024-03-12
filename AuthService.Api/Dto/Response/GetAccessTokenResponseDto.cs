@@ -3,11 +3,11 @@ namespace AuthService.Api.Dto.Response;
 public class GetAccessTokenResponseDto
 {
     public int StatusCode { get; init; }
-    public string AccessToken { get; init; }
+    public AccessTokenResponseDto AccessTokenResponseDto { get; init; }
     
-    public GetAccessTokenResponseDto(int statusCode, string accessToken)
+    public GetAccessTokenResponseDto(int statusCode, AccessTokenResponseDto accessTokenResponseDto)
     {
         StatusCode = statusCode;
-        AccessToken = accessToken;
+        AccessTokenResponseDto = accessTokenResponseDto;
     }
 }
