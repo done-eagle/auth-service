@@ -214,8 +214,8 @@ public class AuthControllerTests
         var result = await authController.Login(TestData.GetAccessTokenDto);
         
         // Assert
-        var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
-        //Assert.Equal(TestData.AccessTokenResponseDto, statusCodeResult.);
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(TestData.AccessTokenResponseDto, objectResult.Value);
     }
     
     [Fact]
@@ -233,8 +233,8 @@ public class AuthControllerTests
         var result = await authController.Login(TestData.GetAccessTokenDto);
         
         // Assert
-        var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
-        Assert.Equal(CodesData.Unauthorized, statusCodeResult.StatusCode);
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(CodesData.Unauthorized, objectResult.StatusCode);
     }
 
     [Fact]
@@ -252,8 +252,8 @@ public class AuthControllerTests
         var result = await authController.GetAccessTokenByRefreshToken(TestData.RefreshTokenDto);
         
         // Assert
-        var contentResult = Assert.IsType<ContentResult>(result);
-        //Assert.Equal("access token", contentResult.Content);
+        var contentResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(TestData.AccessTokenResponseDto, contentResult.Value);
     }
 
     [Fact]
@@ -271,8 +271,8 @@ public class AuthControllerTests
         var result = await authController.GetAccessTokenByRefreshToken(TestData.RefreshTokenDto);
         
         // Assert
-        var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
-        Assert.Equal(CodesData.Unauthorized, statusCodeResult.StatusCode);
+        var objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(CodesData.Unauthorized, objectResult.StatusCode);
     }
 
     [Fact]

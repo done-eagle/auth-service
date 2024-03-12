@@ -108,6 +108,7 @@ internal static class TestData
         ExpiresIn = 10L,
         IdToken = "IdToken",
         NotBeforePolicy = 100,
+        RefreshExpiresIn = 10L,
         RefreshToken = "RefreshToken",
         Scope = "Scope",
         SessionState = "SessionState",

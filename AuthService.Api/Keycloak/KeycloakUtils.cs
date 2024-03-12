@@ -1,4 +1,3 @@
-using System.Text.Json;
 using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Dto.Response;
@@ -6,6 +5,7 @@ using AutoMapper;
 using Flurl.Http;
 using Keycloak.Net;
 using Keycloak.Net.Models.Users;
+using Newtonsoft.Json;
 
 namespace AuthService.Api.Keycloak;
 
@@ -115,7 +115,7 @@ public class KeycloakUtils : IKeycloakUtils
             new FormUrlEncodedContent(requestContent));
 
         var responseContent = await response.Content.ReadAsStringAsync();
-        var accessTokenDto = JsonSerializer.Deserialize<AccessTokenResponseDto>(responseContent);
+        var accessTokenDto = JsonConvert.DeserializeObject<AccessTokenResponseDto>(responseContent);
         
         if (accessTokenDto == null)
             return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
@@ -140,7 +140,7 @@ public class KeycloakUtils : IKeycloakUtils
         
         var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], requestContent);
         var responseContent = await response.Content.ReadAsStringAsync();
-        var accessTokenDto = JsonSerializer.Deserialize<AccessTokenResponseDto>(responseContent);
+        var accessTokenDto = JsonConvert.DeserializeObject<AccessTokenResponseDto>(responseContent);
         
         if (accessTokenDto == null)
             return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
