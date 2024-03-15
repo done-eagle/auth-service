@@ -4,18 +4,11 @@ using AuthService.Api.Сonverters;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-
-// Ocelot
-// builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-// builder.Services.AddOcelot(builder.Configuration);
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(AppMappingProfile));
@@ -43,8 +36,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddSingleton<IClaimsTransformation, KcRoleConverter>();
-
-builder.Services.AddSingleton(builder.Configuration);
 
 builder.Services.AddHttpClient();
 
@@ -81,8 +72,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-// app.UseOcelot().Wait();
 
 app.Run();
 

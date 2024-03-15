@@ -13,7 +13,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
     private readonly WebApplicationFactory<Program> _factory;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _config;
-    private string UserId { get; set; } = null!;
+    private string _userId = null!;
 
     public AuthControllerTests(WebApplicationFactory<Program> factory)
     {
@@ -34,7 +34,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
         
         // Act
         var registerResponse = await client.PostAsync("/api/auth/register", registerContent);
-        UserId = await registerResponse.Content.ReadAsStringAsync();
+        _userId = await registerResponse.Content.ReadAsStringAsync();
         
         // Assert
         Assert.Equal(CodesData.CreatedCode, (int)registerResponse.StatusCode);
@@ -42,6 +42,6 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
     
     public void Dispose()
     {
-        TestHelper.CleanupAsync(_factory, _httpClientFactory, _config, UserId).GetAwaiter().GetResult();
+        TestHelper.CleanupAsync(_factory, _httpClientFactory, _config, _userId).GetAwaiter().GetResult();
     }
 }

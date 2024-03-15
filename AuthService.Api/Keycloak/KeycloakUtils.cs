@@ -26,7 +26,6 @@ public class KeycloakUtils : IKeycloakUtils
             serverUrl, 
             clientSecret, 
             new KeycloakOptions(
-                prefix: "/auth",
                 adminClientId: clientId
             ));
     }

@@ -2,26 +2,26 @@ version: '3'
 
 services:
   keycloak:
-    image: jboss/keycloak
+    image: bitnami/keycloak
     environment:
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin
-      - DB_VENDOR=POSTGRES
-      - DB_ADDR=db
-      - DB_DATABASE=keycloak
-      - DB_USER=keycloak
-      - DB_PASSWORD=password
-      - KEYCLOAK_IMPORT=/path/in/container/realm-export.json
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: POSTGRES
+      DB_ADDR: db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_IMPORT: /config/realm-export.json
     volumes:
-      - ./realm-export.json:/path/in/container/realm-export.json
+      - ./realm-export.json:/config/realm-export.json
     ports:
-      - "8180:8080"
+      - "8080:8080"
     depends_on:
       - db
 
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=keycloak
-      - POSTGRES_USER=keycloak
-      - POSTGRES_PASSWORD=password
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password

@@ -6,7 +6,7 @@ using AuthService.Tests.Data;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace AuthService.Tests.Mock;
+namespace AuthService.Tests.MockTests;
 
 public class AuthControllerTests
 {

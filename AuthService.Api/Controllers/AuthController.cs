@@ -1,4 +1,3 @@
-using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Keycloak;
 using AuthService.Api.Validators;
