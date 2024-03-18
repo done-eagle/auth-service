@@ -859,7 +859,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "UxUoArUQGAlUeDxYMaQUJkZ2FpIx0scg",
       "redirectUris": [
         "https://localhost:8080/redirect"
       ],
