@@ -1,8 +1,10 @@
-version: '3'
+version: '3.9'
 
 services:
   keycloak:
-    image: bitnami/keycloak
+    image: quay.io/keycloak/keycloak:20.0.2
+    command:
+      - start --hostname-strict-https false --hostname-strict false --proxy edge --http-enabled true --import-realm
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -11,9 +13,11 @@ services:
       DB_DATABASE: keycloak
       DB_USER: keycloak
       DB_PASSWORD: password
-      KEYCLOAK_IMPORT: /config/realm-export.json
     volumes:
-      - ./realm-export.json:/config/realm-export.json
+      - type: bind
+        source: ./realm-export.json
+        target: /opt/keycloak/data/import/realm-export.json
+        read_only: true
     ports:
       - "8080:8080"
     depends_on:
