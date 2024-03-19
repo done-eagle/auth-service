@@ -48,7 +48,10 @@ public class KeycloakUtils : IKeycloakUtils
         }
         catch (FlurlHttpException ex)
         {
-            return new CreateUserResponseDto((int)ex.StatusCode!, "");
+            if (ex.StatusCode == null)
+                return new CreateUserResponseDto(500, "");
+            
+            return new CreateUserResponseDto((int)ex.StatusCode, "");
         }
     }
 
@@ -62,6 +65,9 @@ public class KeycloakUtils : IKeycloakUtils
         }
         catch (FlurlHttpException ex)
         {
+            if (ex.StatusCode == null)
+                return new FindUserByIdResponseDto(500, null!);
+            
             return new FindUserByIdResponseDto((int)ex.StatusCode!, null!);
         }
     }
@@ -81,6 +87,9 @@ public class KeycloakUtils : IKeycloakUtils
         }
         catch (FlurlHttpException ex)
         {
+            if (ex.StatusCode == null)
+                return new KeycloakResponseDto(500);
+            
             return new KeycloakResponseDto((int)ex.StatusCode!);
         }
     }
@@ -94,76 +103,100 @@ public class KeycloakUtils : IKeycloakUtils
         }
         catch (FlurlHttpException ex)
         {
+            if (ex.StatusCode == null)
+                return new KeycloakResponseDto(500);
+            
             return new KeycloakResponseDto((int)ex.StatusCode!);
         }
     }
     
     public async Task<GetAccessTokenResponseDto> GetAccessToken(GetAccessTokenRequestDto getAccessTokenRequestDto)
     {
-        using var httpClient = _httpClientFactory.CreateClient();
-        var requestContent = new Dictionary<string, string>
+        try
         {
-            { "grant_type", "authorization_code" },
-            { "client_id", _config["Keycloak:ClientId"] },
-            { "code", getAccessTokenRequestDto.AuthCode },
-            { "redirect_uri", _config["Keycloak:RedirectUri"] },
-            { "code_verifier", getAccessTokenRequestDto.CodeVerifier },
-        };
+            using var httpClient = _httpClientFactory.CreateClient();
+            var requestContent = new Dictionary<string, string>
+            {
+                { "grant_type", "authorization_code" },
+                { "client_id", _config["Keycloak:ClientId"] },
+                { "code", getAccessTokenRequestDto.AuthCode },
+                { "redirect_uri", _config["Keycloak:RedirectUri"] },
+                { "code_verifier", getAccessTokenRequestDto.CodeVerifier },
+            };
 
-        var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
-            new FormUrlEncodedContent(requestContent));
+            var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], 
+                new FormUrlEncodedContent(requestContent));
 
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var accessTokenDto = JsonConvert.DeserializeObject<AccessTokenResponseDto>(responseContent);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var accessTokenDto = JsonConvert.DeserializeObject<AccessTokenResponseDto>(responseContent);
         
-        if (accessTokenDto == null)
-            return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
+            if (accessTokenDto == null)
+                return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
 
-        return new GetAccessTokenResponseDto((int)response.StatusCode, accessTokenDto);
+            return new GetAccessTokenResponseDto((int)response.StatusCode, accessTokenDto);
+        }
+        catch (HttpRequestException)
+        {
+            return new GetAccessTokenResponseDto(500, null!);
+        }
     }
 
     public async Task<GetAccessTokenResponseDto> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
     {
-        var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
-
-        if (!checkRefreshTokenResponse.IsSuccessStatusCode)
-            return new GetAccessTokenResponseDto((int)checkRefreshTokenResponse.StatusCode, null!);
-        
-        using var httpClient = _httpClientFactory.CreateClient();
-        var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
+        try
         {
-            { "grant_type", "refresh_token" },
-            { "client_id", _config["Keycloak:ClientId"] },
-            { "refresh_token", refreshTokenRequestDto.RefreshToken }
-        });
-        
-        var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], requestContent);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var accessTokenDto = JsonConvert.DeserializeObject<AccessTokenResponseDto>(responseContent);
-        
-        if (accessTokenDto == null)
-            return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
+            var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
 
-        return new GetAccessTokenResponseDto((int)response.StatusCode, accessTokenDto);
+            if (!checkRefreshTokenResponse.IsSuccessStatusCode)
+                return new GetAccessTokenResponseDto((int)checkRefreshTokenResponse.StatusCode, null!);
+        
+            using var httpClient = _httpClientFactory.CreateClient();
+            var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "grant_type", "refresh_token" },
+                { "client_id", _config["Keycloak:ClientId"] },
+                { "refresh_token", refreshTokenRequestDto.RefreshToken }
+            });
+        
+            var response = await httpClient.PostAsync(_config["Keycloak:TokenUrl"], requestContent);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var accessTokenDto = JsonConvert.DeserializeObject<AccessTokenResponseDto>(responseContent);
+        
+            if (accessTokenDto == null)
+                return new GetAccessTokenResponseDto((int)response.StatusCode, null!);
+
+            return new GetAccessTokenResponseDto((int)response.StatusCode, accessTokenDto);
+        }
+        catch (HttpRequestException)
+        {
+            return new GetAccessTokenResponseDto(500, null!);
+        }
     }
 
     public async Task<KeycloakResponseDto> LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto)
     {
-        var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
-        
-        if (!checkRefreshTokenResponse.IsSuccessStatusCode)
-            return new KeycloakResponseDto((int)checkRefreshTokenResponse.StatusCode);
-        
-        using var httpClient = _httpClientFactory.CreateClient();
-        var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
+        try
         {
-            { "refresh_token", refreshTokenRequestDto.RefreshToken },
-            { "client_id", _config["Keycloak:ClientId"] }
-        });
+            var checkRefreshTokenResponse = await CheckRefreshToken(refreshTokenRequestDto);
         
-        var response = await httpClient.PostAsync(_config["Keycloak:LogoutUrl"], requestContent);
+            if (!checkRefreshTokenResponse.IsSuccessStatusCode)
+                return new KeycloakResponseDto((int)checkRefreshTokenResponse.StatusCode);
+        
+            using var httpClient = _httpClientFactory.CreateClient();
+            var requestContent = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "refresh_token", refreshTokenRequestDto.RefreshToken },
+                { "client_id", _config["Keycloak:ClientId"] }
+            });
+        
+            var response = await httpClient.PostAsync(_config["Keycloak:LogoutUrl"], requestContent);
 
-        return new KeycloakResponseDto((int)response.StatusCode);
+            return new KeycloakResponseDto((int)response.StatusCode);
+        }
+        catch (HttpRequestException)
+        {
+            return new KeycloakResponseDto(500);
+        }
     }
 
     private async Task<HttpResponseMessage> CheckRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto)
