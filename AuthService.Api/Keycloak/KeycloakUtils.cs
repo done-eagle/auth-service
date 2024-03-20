@@ -1,4 +1,3 @@
-using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Dto.Response;
 using AutoMapper;
@@ -44,12 +43,12 @@ public class KeycloakUtils : IKeycloakUtils
             var createdUserId = await _keycloakClient.CreateAndRetrieveUserIdAsync(_config[RealmConfigKey], user);
             Console.WriteLine($"User created with userId: {createdUserId}");
 
-            return new CreateUserResponseDto(CodesData.CreatedCode, createdUserId);
+            return new CreateUserResponseDto(StatusCodes.Status201Created, createdUserId);
         }
         catch (FlurlHttpException ex)
         {
             if (ex.StatusCode == null)
-                return new CreateUserResponseDto(500, "");
+                return new CreateUserResponseDto(StatusCodes.Status500InternalServerError, "");
             
             return new CreateUserResponseDto((int)ex.StatusCode, "");
         }
@@ -61,12 +60,12 @@ public class KeycloakUtils : IKeycloakUtils
         {
             var user = await _keycloakClient.GetUserAsync(_config[RealmConfigKey], findUserByIdRequestDto.UserId);
             var userDto = _mapper.Map<UserResponseDto>(user);
-            return new FindUserByIdResponseDto(CodesData.SuccessCode, userDto);
+            return new FindUserByIdResponseDto(StatusCodes.Status200OK, userDto);
         }
         catch (FlurlHttpException ex)
         {
             if (ex.StatusCode == null)
-                return new FindUserByIdResponseDto(500, null!);
+                return new FindUserByIdResponseDto(StatusCodes.Status500InternalServerError, null!);
             
             return new FindUserByIdResponseDto((int)ex.StatusCode!, null!);
         }
@@ -83,12 +82,12 @@ public class KeycloakUtils : IKeycloakUtils
             user.Credentials = new[] { credential };
         
             await _keycloakClient.UpdateUserAsync(_config[RealmConfigKey], updateUserRequestDto.UserId, user);
-            return new KeycloakResponseDto(CodesData.SuccessCode);
+            return new KeycloakResponseDto(StatusCodes.Status200OK);
         }
         catch (FlurlHttpException ex)
         {
             if (ex.StatusCode == null)
-                return new KeycloakResponseDto(500);
+                return new KeycloakResponseDto(StatusCodes.Status500InternalServerError);
             
             return new KeycloakResponseDto((int)ex.StatusCode!);
         }
@@ -99,12 +98,12 @@ public class KeycloakUtils : IKeycloakUtils
         try
         {
             await _keycloakClient.DeleteUserAsync(_config[RealmConfigKey], findUserByIdRequestDto.UserId);
-            return new KeycloakResponseDto(CodesData.SuccessCode);
+            return new KeycloakResponseDto(StatusCodes.Status200OK);
         }
         catch (FlurlHttpException ex)
         {
             if (ex.StatusCode == null)
-                return new KeycloakResponseDto(500);
+                return new KeycloakResponseDto(StatusCodes.Status500InternalServerError);
             
             return new KeycloakResponseDto((int)ex.StatusCode!);
         }
@@ -137,7 +136,7 @@ public class KeycloakUtils : IKeycloakUtils
         }
         catch (HttpRequestException)
         {
-            return new GetAccessTokenResponseDto(500, null!);
+            return new GetAccessTokenResponseDto(StatusCodes.Status500InternalServerError, null!);
         }
     }
 
@@ -169,7 +168,7 @@ public class KeycloakUtils : IKeycloakUtils
         }
         catch (HttpRequestException)
         {
-            return new GetAccessTokenResponseDto(500, null!);
+            return new GetAccessTokenResponseDto(StatusCodes.Status500InternalServerError, null!);
         }
     }
 
@@ -195,7 +194,7 @@ public class KeycloakUtils : IKeycloakUtils
         }
         catch (HttpRequestException)
         {
-            return new KeycloakResponseDto(500);
+            return new KeycloakResponseDto(StatusCodes.Status500InternalServerError);
         }
     }
 

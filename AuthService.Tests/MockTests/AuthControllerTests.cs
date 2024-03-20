@@ -1,8 +1,8 @@
 using AuthService.Api.Controllers;
-using AuthService.Api.Data;
 using AuthService.Api.Dto.Response;
 using AuthService.Api.Keycloak;
 using AuthService.Tests.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -22,7 +22,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -37,7 +37,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -52,7 +52,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -67,7 +67,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -82,7 +82,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -97,7 +97,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -112,7 +112,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -127,7 +127,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -142,7 +142,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -157,7 +157,7 @@ public class AuthControllerTests
         
         // Assert
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.Equal(CodesData.BadRequest, badRequestResult.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
     }
     
     [Fact]
@@ -167,7 +167,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.CreateUser(AuthControllerTestData.CreateUserDto))
-            .Returns(Task.FromResult(new CreateUserResponseDto(CodesData.CreatedCode, "userId")));
+            .Returns(Task.FromResult(new CreateUserResponseDto(StatusCodes.Status201Created, "userId")));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -176,7 +176,7 @@ public class AuthControllerTests
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(CodesData.CreatedCode, objectResult.StatusCode);
+        Assert.Equal(StatusCodes.Status201Created, objectResult.StatusCode);
         Assert.Equal("userId", objectResult.Value);
     }
 
@@ -187,7 +187,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.CreateUser(AuthControllerTestData.CreateUserDto))
-            .Returns(Task.FromResult(new CreateUserResponseDto(CodesData.ConflictCode, "")));
+            .Returns(Task.FromResult(new CreateUserResponseDto(StatusCodes.Status409Conflict, "")));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -196,7 +196,7 @@ public class AuthControllerTests
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(CodesData.ConflictCode, objectResult.StatusCode);
+        Assert.Equal(StatusCodes.Status409Conflict, objectResult.StatusCode);
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.GetAccessToken(AuthControllerTestData.GetAccessTokenDto))
-            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.SuccessCode, AuthControllerTestData.AccessTokenResponseDto)));
+            .Returns(Task.FromResult(new GetAccessTokenResponseDto(StatusCodes.Status200OK, AuthControllerTestData.AccessTokenResponseDto)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -225,7 +225,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.GetAccessToken(AuthControllerTestData.GetAccessTokenDto))
-            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.Unauthorized, null!)));
+            .Returns(Task.FromResult(new GetAccessTokenResponseDto(StatusCodes.Status401Unauthorized, null!)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -234,7 +234,7 @@ public class AuthControllerTests
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(CodesData.Unauthorized, objectResult.StatusCode);
+        Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.GetAccessTokenByRefreshToken(AuthControllerTestData.RefreshTokenDto))
-            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.SuccessCode, AuthControllerTestData.AccessTokenResponseDto)));
+            .Returns(Task.FromResult(new GetAccessTokenResponseDto(StatusCodes.Status200OK, AuthControllerTestData.AccessTokenResponseDto)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -263,7 +263,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.GetAccessTokenByRefreshToken(AuthControllerTestData.RefreshTokenDto))
-            .Returns(Task.FromResult(new GetAccessTokenResponseDto(CodesData.Unauthorized, null!)));
+            .Returns(Task.FromResult(new GetAccessTokenResponseDto(StatusCodes.Status401Unauthorized, null!)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -272,7 +272,7 @@ public class AuthControllerTests
         
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(CodesData.Unauthorized, objectResult.StatusCode);
+        Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
     }
 
     [Fact]
@@ -282,7 +282,7 @@ public class AuthControllerTests
         var keycloakUtilsMock = new Mock<IKeycloakUtils>();
         keycloakUtilsMock.Setup(x => 
                 x.LogoutUser(AuthControllerTestData.RefreshTokenDto))
-            .Returns(Task.FromResult(new KeycloakResponseDto(CodesData.NoContent)));
+            .Returns(Task.FromResult(new KeycloakResponseDto(StatusCodes.Status204NoContent)));
         
         var authController = new AuthController(keycloakUtilsMock.Object);
         
@@ -291,6 +291,6 @@ public class AuthControllerTests
         
         // Assert
         var statusCodeResult = Assert.IsType<StatusCodeResult>(result);
-        Assert.Equal(CodesData.NoContent, statusCodeResult.StatusCode);
+        Assert.Equal(StatusCodes.Status204NoContent, statusCodeResult.StatusCode);
     }
 }

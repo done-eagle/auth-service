@@ -1,6 +1,6 @@
 using System.Text;
-using AuthService.Api.Data;
 using AuthService.Tests.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -37,7 +37,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
         _userId = await registerResponse.Content.ReadAsStringAsync();
         
         // Assert
-        Assert.Equal(CodesData.CreatedCode, (int)registerResponse.StatusCode);
+        Assert.Equal(StatusCodes.Status201Created, (int)registerResponse.StatusCode);
     }
     
     public void Dispose()

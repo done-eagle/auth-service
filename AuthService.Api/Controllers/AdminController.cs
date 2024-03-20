@@ -1,8 +1,6 @@
-using AuthService.Api.Data;
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Keycloak;
 using AuthService.Api.Validators;
-using Flurl.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,7 +42,7 @@ public class AdminController : ControllerBase
         
         var responseDto = await _keycloakUtils.FindById(findUserByIdRequestDto);
         
-        if (responseDto.StatusCode != CodesData.SuccessCode)
+        if (responseDto.StatusCode != StatusCodes.Status200OK)
             return StatusCode(responseDto.StatusCode);
         
         return Ok(responseDto.UserResponseDto);
