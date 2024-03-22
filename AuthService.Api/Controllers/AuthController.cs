@@ -30,7 +30,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Login([FromBody] GetAccessTokenRequestDto userRequestDto)
+    public async Task<IActionResult> Login([FromHeader] GetAccessTokenRequestDto userRequestDto)
     {
         var validator = new GetAccessTokenDtoValidator();
         var validationResult = await validator.ValidateAsync(userRequestDto);
