@@ -48,19 +48,6 @@ public class AdminController : ControllerBase
         return Ok(responseDto.UserResponseDto);
     }
 
-    [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateUserRequestDto updateUserRequestDto)
-    {
-        var validator = new UpdateUserDtoValidator();
-        var validationResult = await validator.ValidateAsync(updateUserRequestDto);
-        
-        if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
-        
-        var responseDto = await _keycloakUtils.UpdateUser(updateUserRequestDto);
-        return StatusCode(responseDto.StatusCode);
-    }
-
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] FindUserByIdRequestDto findUserByIdRequestDto)
     {

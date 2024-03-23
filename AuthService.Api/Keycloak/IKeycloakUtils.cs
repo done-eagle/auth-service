@@ -10,6 +10,6 @@ public interface IKeycloakUtils
     Task<GetAccessTokenResponseDto> GetAccessTokenByRefreshToken(RefreshTokenRequestDto refreshTokenRequestDto);
     Task<KeycloakResponseDto> LogoutUser(RefreshTokenRequestDto refreshTokenRequestDto);
     Task<FindUserByIdResponseDto> FindById(FindUserByIdRequestDto findUserByIdRequestDto);
-    Task<KeycloakResponseDto> UpdateUser(UpdateUserRequestDto updateUserRequestDto);
+    Task<KeycloakResponseDto> UpdateUser(ChangeUserPasswordRequestDto changeUserPasswordRequestDto);
     Task<KeycloakResponseDto> DeleteUser(FindUserByIdRequestDto findUserByIdRequestDto);
 }

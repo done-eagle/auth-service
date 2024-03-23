@@ -54,9 +54,9 @@ services:
       retries: 3
       timeout: 5s
       
-  web-api:
+  auth-web-api:
     build: .
-    container_name: web-api
+    container_name: auth-web-api
     networks:
       - my_bridge_network
     ports:

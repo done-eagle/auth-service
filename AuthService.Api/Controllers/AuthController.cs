@@ -1,6 +1,7 @@
 using AuthService.Api.Dto.Request;
 using AuthService.Api.Keycloak;
 using AuthService.Api.Validators;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Api.Controllers;
@@ -53,6 +54,20 @@ public class AuthController : ControllerBase
         
         var accessTokenResponse = await _keycloakUtils.GetAccessTokenByRefreshToken(refreshTokenRequestDto);
         return StatusCode(accessTokenResponse.StatusCode, accessTokenResponse.AccessTokenResponseDto);
+    }
+    
+    [HttpPut]
+    [Authorize(Roles = "user")]
+    public async Task<IActionResult> СhangeUserPassword([FromBody] ChangeUserPasswordRequestDto changeUserPasswordRequestDto)
+    {
+        var validator = new ChangeUserPasswordDtoValidator();
+        var validationResult = await validator.ValidateAsync(changeUserPasswordRequestDto);
+        
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
+        
+        var responseDto = await _keycloakUtils.UpdateUser(changeUserPasswordRequestDto);
+        return StatusCode(responseDto.StatusCode);
     }
     
     [HttpGet]

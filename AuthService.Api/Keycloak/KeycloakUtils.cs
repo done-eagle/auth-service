@@ -71,17 +71,16 @@ public class KeycloakUtils : IKeycloakUtils
         }
     }
 
-    public async Task<KeycloakResponseDto> UpdateUser(UpdateUserRequestDto updateUserRequestDto)
+    public async Task<KeycloakResponseDto> UpdateUser(ChangeUserPasswordRequestDto changeUserPasswordRequestDto)
     {
         try
         {
-            var user = await _keycloakClient.GetUserAsync(_config[RealmConfigKey], updateUserRequestDto.UserId);
-            var credential = CreatePasswordCredentials(updateUserRequestDto.Password);
-        
-            user.Email = updateUserRequestDto.Email;
+            var user = await _keycloakClient.GetUserAsync(_config[RealmConfigKey], changeUserPasswordRequestDto.UserId);
+            var credential = CreatePasswordCredentials(changeUserPasswordRequestDto.Password);
+            
             user.Credentials = new[] { credential };
         
-            await _keycloakClient.UpdateUserAsync(_config[RealmConfigKey], updateUserRequestDto.UserId, user);
+            await _keycloakClient.UpdateUserAsync(_config[RealmConfigKey], changeUserPasswordRequestDto.UserId, user);
             return new KeycloakResponseDto(StatusCodes.Status200OK);
         }
         catch (FlurlHttpException ex)
