@@ -43,7 +43,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetAccessTokenByRefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto)
+    public async Task<IActionResult> GetAccessTokenByRefreshToken([FromHeader] RefreshTokenRequestDto refreshTokenRequestDto)
     {
         var validator = new RefreshTokenDtoValidator();
         var validationResult = await validator.ValidateAsync(refreshTokenRequestDto);
@@ -56,7 +56,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> Logout(RefreshTokenRequestDto refreshTokenRequestDto)
+    public async Task<IActionResult> Logout([FromHeader] RefreshTokenRequestDto refreshTokenRequestDto)
     {
         var validator = new RefreshTokenDtoValidator();
         var validationResult = await validator.ValidateAsync(refreshTokenRequestDto);

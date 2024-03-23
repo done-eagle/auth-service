@@ -1,6 +1,4 @@
 using System.Text;
-using AuthService.Api.Dto.Request;
-using AuthService.Api.Dto.Response;
 using AuthService.Tests.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -29,7 +27,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task ComplexSession()
     {
-        // Регистрация
+        /* Регистрация */
         
         // Arrange
         using var client = _factory.CreateClient();
@@ -45,7 +43,7 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
         // Assert
         Assert.Equal(StatusCodes.Status201Created, (int)registerResponse.StatusCode);
         
-        // Логин
+        /* Логин */
         
         // Arrange
         var codeVerifier = PkceGen.GenerateCodeVerifier();
@@ -88,14 +86,37 @@ public class AuthControllerTests : IClassFixture<WebApplicationFactory<Program>>
                 authCode = parts[1];
         }
         
-        var url = $"/api/auth/login?authcode={authCode}&codeverifier={codeVerifier}";
+        var loginUrl = $"/api/auth/login?authcode={authCode}&codeverifier={codeVerifier}";
         
         // Act
-        var loginResponse = await client.GetAsync(url);
+        var loginResponse = await client.GetAsync(loginUrl);
         var responseContent = await loginResponse.Content.ReadAsStringAsync();
+        var accessTokenDto = JsonConvert.DeserializeObject<AccessTokenResponseTestDto>(responseContent);
         
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)loginResponse.StatusCode);
+        
+        /* Обновление access_token по refresh_token */
+        
+        // Arrange
+        var refreshTokenUrl = $"/api/auth/getAccessTokenByRefreshToken?refreshtoken={accessTokenDto!.RefreshToken}";
+        
+        // Act
+        var accessTokenUpdateResponse = await client.GetAsync(refreshTokenUrl);
+        
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)accessTokenUpdateResponse.StatusCode);
+        
+        /* Логаут */
+        
+        // Arrange
+        var logoutUrl = $"/api/auth/logout?refreshtoken={accessTokenDto!.RefreshToken}";
+        
+        // Act
+        var logoutResponse = await client.GetAsync(logoutUrl);
+        
+        // Assert
+        Assert.Equal(StatusCodes.Status204NoContent, (int)logoutResponse.StatusCode);
     }
     
     public void Dispose()
